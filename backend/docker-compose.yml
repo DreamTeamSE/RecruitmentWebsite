@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgresdb
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgresdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_vol:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_vol:
