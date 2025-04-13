@@ -1,6 +1,6 @@
 export interface InterviewNotes {
-    recruiterNotesId: number;
-    interviewId: number;
+    id: number;  
+    interview_entry: number;
     notes?: string;
     score?: number;
   }

@@ -1,6 +1,6 @@
 // models/Form.ts
 export interface Form {
-  form_id: number;
+  id: number;
   recruiter_id: number;
   title: string;
   description?: string;

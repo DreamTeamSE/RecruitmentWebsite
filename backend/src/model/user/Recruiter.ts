@@ -1,5 +1,5 @@
 export default interface Recruiter {
-    recruiter_id: Text;
+    id: string;
     first_name: string;
     last_name: string;
   }

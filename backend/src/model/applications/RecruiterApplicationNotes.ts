@@ -1,6 +1,6 @@
 export interface RecruiterApplicationNotes {
-    recruiterNotesId: number;
-    formEntryId: number;
+    id: number;
+    form_entry_id: number;
     notes?: string;
     score?: number;
   }
