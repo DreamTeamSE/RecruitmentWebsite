@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
 import psql_client from "../config/postgresClient";
-import  { Candidate } from '../model/Candidate';
+import  { Candidate } from '../model/user/Candidate';
 
 
 const insertCanidate = async (

@@ -1,8 +1,8 @@
 import { QueryResult } from 'pg';
 import psql_client from "../config/postgresClient";
-import { Form } from '../model/Form';
-import { Question, QuestionType } from '../model/Question';
-import { Answer } from '../model/Answer';
+import { Form } from '../model/applications/Form';
+import { Question, QuestionType } from '../model/applications/Question';
+import { Answer } from '../model/applications/Answer';
 
 const insertForm = async (
     form: { recruiter_id: string; title: string; description: string }

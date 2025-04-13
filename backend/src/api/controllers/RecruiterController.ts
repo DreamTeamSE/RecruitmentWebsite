@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Recruiter from "../../model/Recruiter";
+import Recruiter from "../../model/user/Recruiter";
 import { insertRecruiter } from "../../repositories/RecruiterRepository";
 
 export const createRecruiter = async (req: Request, res: Response) => {
