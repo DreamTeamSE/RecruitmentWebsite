@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertForm, selectFeed } from "../../repositories/FormRepository"
+import { insertAnswer, insertForm, insertQuestion, selectFeed } from "../../repositories/FormRepository"
 
 // GET /forms
 export const getFeed = async (req: Request, res: Response) => {
@@ -14,5 +14,20 @@ export const createForm = (req: Request, res: Response) => {
   insertForm(form);
   res.status(201).json({ message: "Form created", form });
 };
+
+export const createQuestion = (req: Request, res: Response) => {
+  const { form_id, question_text, question_type, question_order } = req.body;
+  const question_entry = {  form_id, question_text, question_type, question_order };
+  insertQuestion(question_entry);
+  res.status(201).json({ message: "Question created", question_entry });
+};
+
+export const createAnswer = (req: Request, res: Response) => {
+  const { candidate_id, question_id, answer_type, response_text, video_id } = req.body;
+  const answer_entry = {  candidate_id, question_id, answer_type, response_text, video_id };
+  insertAnswer(answer_entry);
+  res.status(201).json({ message: "Answer created", answer_entry });
+};
+
 
 
