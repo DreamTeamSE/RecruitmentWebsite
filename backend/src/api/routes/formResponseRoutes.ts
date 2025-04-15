@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import { createQuestion, createAnswerText  } from '../controllers/form/FormResponseController';
+import { createQuestion, createAnswerText, createFormEntry  } from '../controllers/form/FormResponseController';
 
 const router = Router();
 
 
-// Post /api/form/response
-router.post("/create/question", createQuestion)
-router.post("/create/answer/text", createAnswerText)
+// Post /api/form
+router.post("/application", createFormEntry)
+router.post("/answer/text", createAnswerText)
+router.post("/question", createQuestion)
+router.post("/answer/text", createAnswerText)
 
 
 
