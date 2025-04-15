@@ -11,6 +11,10 @@
 | created_by    | TEXT      | NOT NULL, FOREIGN KEY                | References the recruiter (uuid) who created it    |
 | created_at    | TIMESTAMP | DEFAULT now()                        | Timestamp of when the interview was created       |
 
+**Relationships**:
+- `form_id` → `Form.id` (One-to-One)
+- `created_by` → `Recruiter.uuid` (Many-to-One)
+
 ## Table: `InterviewEntry`
 
 **Description**: Links a candidate’s form submission to a specific interview session and tracks who selected them.
@@ -23,6 +27,11 @@
 | selected_by      | TEXT      | NOT NULL, FOREIGN KEY                     | References the recruiter (uuid) who selected the candidate     |
 | UNIQUE Constraint| —         | UNIQUE(interview_id, form_entry_id)       | Ensures each form entry appears only once per interview        |
 
+**Relationships**:
+- `interview_id` → `Interview.id` (Many-to-One)
+- `form_entry_id` → `FormEntry.id` (Many-to-One)
+- `selected_by` → `Recruiter.uuid` (Many-to-One)
+
 ## Table: `InterviewNotes`
 
 **Description**: Contains evaluator notes and scores for individual interview entries.
@@ -33,3 +42,6 @@
 | interview_entry_id | INTEGER   | NOT NULL, UNIQUE, FOREIGN KEY        | References the interview entry being evaluated      |
 | notes              | TEXT      | *Optional*                           | Notes provided by the evaluator                     |
 | score              | NUMERIC   | *Optional*                           | Numeric score assigned to the candidate             |
+
+**Relationships**:
+- `interview_entry_id` → `InterviewEntry.id` (One-to-One)
