@@ -37,3 +37,6 @@ Thumbs.db
 *.bak
 *.orig
 *.rej
+
+# Python virtual environment
+venv/

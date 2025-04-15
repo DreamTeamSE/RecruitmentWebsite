@@ -1,0 +1,26 @@
+site_name: My Project Documentation
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Users: users.md
+  - Applications: applications.md
+  - Interviews: interviews.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search

@@ -1,22 +1,23 @@
 import { QueryResult } from 'pg';
 import psql_client from "../config/postgresClient";
-import { Form } from '../model/Form';
-import { Question, QuestionType } from '../model/Question';
-import { Answer } from '../model/Answer';
+import { Form } from '../model/applications/Form';
+import { Question, QuestionType } from '../model/applications/Question';
+import { Answer } from '../model/applications/Answer';
+import { AnswerText } from '../model/applications/AnswerText'
 
 const insertForm = async (
     form: { recruiter_id: string; title: string; description: string }
-): Promise<number> => {
+): Promise<Form> => {
     const client = await psql_client.connect();
     try {
         const query = `
             INSERT INTO form (recruiter_id, title, description)
             VALUES ($1, $2, $3)
-            RETURNING form_id;
+            RETURNING *;
         `;
         const values = [form.recruiter_id, form.title, form.description];
         const result: QueryResult = await client.query(query, values);
-        return result.rows[0].form_id;
+        return result.rows[0];
     } finally {
         client.release();
     }
@@ -57,26 +58,49 @@ const insertQuestion = async (question : {
 }
 
 
-const insertAnswer = async (answer: {
+const insertAnswerText = async (answer: {
     candidate_id: number;
     question_id: number;
     answer_type: QuestionType;
-    response_text?: string;
-    video_id?: string;
+    response_text: string;
+}): Promise<AnswerText> => {
+    const client = await psql_client.connect();
+    try {
+    const insertedAnswer = await insertAnswer(answer)
+    const query = `
+        INSERT INTO AnswerText (answer_id, response_text)
+        VALUES ($1, $2)
+        RETURNING *; 
+    `;
+    const values = [
+        insertedAnswer.id,
+        answer.response_text,
+    ];
+
+    const result: QueryResult = await client.query(query, values);
+    return result.rows[0];
+    }  finally {
+        client.release();
+    }
+};
+
+
+const insertAnswer = async (answer: { 
+    candidate_id: number;
+    question_id: number;
+    answer_type: QuestionType;
 }): Promise<Answer> => {
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO answer (candidate_id, question_id, answer_type, response_text, video_id)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO answer (candidate_id, question_id, answer_type)
+            VALUES ($1, $2, $3)
             RETURNING *;
         `;
         const values = [
             answer.candidate_id,
             answer.question_id,
             answer.answer_type,
-            answer.response_text || null,
-            answer.video_id || null
         ];
         const result: QueryResult = await client.query(query, values);
         return result.rows[0];
@@ -85,4 +109,4 @@ const insertAnswer = async (answer: {
     }
 };
 
-export{ insertQuestion, insertAnswer, insertForm, selectFeed };
+export{ insertQuestion, insertAnswerText, insertForm, selectFeed };

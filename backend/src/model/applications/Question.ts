@@ -1,7 +1,7 @@
 export type QuestionType = 'text' | 'video';
 
 export interface Question {
-    question_id: number;
+    id: number;
     form_id: number;
     question_text: string;
     question_type: QuestionType;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getFeed, createForm, createQuestion, createAnswer,  } from '../controllers/FormController';
+import { getFeed, createForm  } from '../controllers/form/FormController';
 
 const router = Router();
 
@@ -9,8 +9,6 @@ router.get("/feed", getFeed)
 
 // POST /api/forms
 router.post("/create/application", createForm)
-router.post("/create/question", createQuestion)
-router.post("/create/answer", createAnswer)
 
 
 
