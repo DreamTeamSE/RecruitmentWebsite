@@ -1,10 +1,10 @@
 -- Interview table
 CREATE TABLE Interview (
   id SERIAL PRIMARY KEY,
-  form_entry_id INTEGER NOT NULL UNIQUE, -- Ensuring one interview per form entry
+  form_id INTEGER NOT NULL UNIQUE, -- Ensuring one interview per form entry
   created_by TEXT NOT NULL, -- referencing Recruiter(uuid), which is TEXT
   created_at TIMESTAMP DEFAULT now(),
-  FOREIGN KEY (form_entry_id) REFERENCES FormEntry(id),
+  FOREIGN KEY (form_id) REFERENCES Form(id),
   FOREIGN KEY (created_by) REFERENCES Recruiter(uuid)
 );
 
