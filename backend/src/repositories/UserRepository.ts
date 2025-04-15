@@ -1,11 +1,14 @@
 import { QueryResult } from 'pg';
 import psql_client from "../config/postgresClient";
-import  { Candidate } from '../model/Candidate';
+import  { User } from '../model/user/User';
 
 
-const insertCanidate = async (
-    canidate: Candidate
-): Promise<number> => {
+const insertUser = async (
+    user: {
+        first_name : string, 
+        last_name : string
+    }
+): Promise<User> => {
     const client = await psql_client.connect();
     try {
         const query = `
