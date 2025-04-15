@@ -52,28 +52,28 @@ Stores the individual questions for each form.
 
 ---
 
-## 🗂️ Table: `Candidate`
+## 🗂️ Table: `User`
 
 ### Description
-Stores candidate information.
+Stores user information.
 
 | Column Name   | Data Type | Constraints     | Description                  |
 |---------------|-----------|------------------|------------------------------|
-| candidate_id  | SERIAL    | PRIMARY KEY     | Unique candidate ID          |
-| first_name    | TEXT      | NOT NULL        | Candidate's first name       |
-| last_name     | TEXT      | NOT NULL        | Candidate's last name        |
+| user_id  | SERIAL    | PRIMARY KEY     | Unique user ID          |
+| first_name    | TEXT      | NOT NULL        | User's first name       |
+| last_name     | TEXT      | NOT NULL        | User's last name        |
 
 ---
 
 ## 🗂️ Table: `FormEntry`
 
 ### Description
-Represents a submission of a form by a candidate.
+Represents a submission of a form by a user.
 
 | Column Name     | Data Type | Constraints              | Description                         |
 |------------------|-----------|---------------------------|-------------------------------------|
 | form_entry_id    | SERIAL    | PRIMARY KEY              | Unique ID for the entry             |
-| candidate_id     | INTEGER   | NOT NULL, FOREIGN KEY    | Candidate who submitted the form    |
+| user_id     | INTEGER   | NOT NULL, FOREIGN KEY    | User who submitted the form    |
 | form_id          | INTEGER   | NOT NULL, FOREIGN KEY    | Form that was submitted             |
 | submitted_at     | TIMESTAMP | DEFAULT now()            | Time of submission                  |
 
@@ -82,12 +82,12 @@ Represents a submission of a form by a candidate.
 ## 🗂️ Table: `Answer`
 
 ### Description
-Stores answers submitted by candidates for each question.
+Stores answers submitted by users for each question.
 
 | Column Name   | Data Type | Constraints              | Description                     |
 |---------------|-----------|---------------------------|---------------------------------|
 | answer_id     | SERIAL    | PRIMARY KEY              | Unique answer ID                |
-| candidate_id  | INTEGER   | NOT NULL, FOREIGN KEY    | Who answered                    |
+| user_id  | INTEGER   | NOT NULL, FOREIGN KEY    | Who answered                    |
 | question_id   | INTEGER   | NOT NULL, FOREIGN KEY    | The question being answered     |
 
 ---

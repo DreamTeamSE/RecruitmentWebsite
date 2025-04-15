@@ -58,7 +58,7 @@ const insertQuestion = async (question : {
 
 
 const insertAnswer = async (answer: {
-    candidate_id: number;
+    user_id: number;
     question_id: number;
     answer_type: QuestionType;
     response_text?: string;
@@ -67,12 +67,12 @@ const insertAnswer = async (answer: {
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO answer (candidate_id, question_id, answer_type, response_text, video_id)
+            INSERT INTO answer (user_id, question_id, answer_type, response_text, video_id)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING *;
         `;
         const values = [
-            answer.candidate_id,
+            answer.user_id,
             answer.question_id,
             answer.answer_type,
             answer.response_text || null,

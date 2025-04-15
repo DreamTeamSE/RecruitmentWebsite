@@ -13,10 +13,10 @@
 
 ## Table: `User`
 
-**Description**: Stores information about candidates who submit form entries.
+**Description**: Stores information about users who submit form entries.
 
 | Column Name | Data Type | Constraints | Description                 |
 |-------------|-----------|-------------|-----------------------------|
-| id          | SERIAL    | PRIMARY KEY | Unique ID for the candidate |
-| first_name  | TEXT      | NOT NULL    | Candidate's first name      |
-| last_name   | TEXT      | NOT NULL    | Candidate's last name       |
+| id          | SERIAL    | PRIMARY KEY | Unique ID for the user |
+| first_name  | TEXT      | NOT NULL    | User's first name      |
+| last_name   | TEXT      | NOT NULL    | User's last name       |

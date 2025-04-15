@@ -12,11 +12,11 @@ const insertUser = async (
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO candidate (first_name, last_name)
+            INSERT INTO user (first_name, last_name)
             VALUES ($1, $2)
-            RETURNING candidate_id;
+            RETURNING user_id;
         `;
-        const values = [canidate.first_name, canidate.last_name];
+        const values = [user.first_name, user.last_name];
         const result: QueryResult = await client.query(query, values);
         return result.rows[0].recruiter_id;
     } finally {
@@ -24,4 +24,4 @@ const insertUser = async (
     }
 };
 
-export{ insertCanidate };
+export{ insertUser };

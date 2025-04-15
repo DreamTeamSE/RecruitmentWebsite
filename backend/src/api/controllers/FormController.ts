@@ -23,8 +23,8 @@ export const createQuestion = (req: Request, res: Response) => {
 };
 
 export const createAnswer = (req: Request, res: Response) => {
-  const { candidate_id, question_id, answer_type, response_text, video_id } = req.body;
-  const answer_entry = {  candidate_id, question_id, answer_type, response_text, video_id };
+  const { user_id, question_id, answer_type, response_text, video_id } = req.body;
+  const answer_entry = {  user_id, question_id, answer_type, response_text, video_id };
   insertAnswer(answer_entry);
   res.status(201).json({ message: "Answer created", answer_entry });
 };

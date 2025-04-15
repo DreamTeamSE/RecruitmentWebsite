@@ -16,7 +16,7 @@ CREATE TABLE Question (
 
 CREATE TABLE FormEntry (
   id SERIAL PRIMARY KEY,
-  candidate_id INTEGER NOT NULL REFERENCES User(id),
+  user_id INTEGER NOT NULL REFERENCES User(id),
   form_id INTEGER NOT NULL REFERENCES Form(id),
   submitted_at TIMESTAMP DEFAULT date_trunc('second', now())
 );
@@ -24,7 +24,7 @@ CREATE TABLE FormEntry (
 CREATE TABLE Answer (
   id SERIAL PRIMARY KEY,
   answer_type TEXT NOT NULL,
-  candidate_id INTEGER NOT NULL REFERENCES User(id),
+  user_id INTEGER NOT NULL REFERENCES User(id),
   question_id INTEGER NOT NULL UNIQUE REFERENCES Question(id)
 );
 

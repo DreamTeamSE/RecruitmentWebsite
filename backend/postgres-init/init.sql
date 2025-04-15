@@ -8,9 +8,9 @@ CREATE TABLE Recruiter (
     last_name TEXT NOT NULL
 );
 
--- Candidate table
-CREATE TABLE Candidate (
-    candidate_id SERIAL PRIMARY KEY,
+-- User table
+CREATE TABLE User (
+    user_id SERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL
 );
@@ -36,7 +36,7 @@ CREATE TABLE Question (
 -- FormEntry table
 CREATE TABLE FormEntry (
     form_entry_id SERIAL PRIMARY KEY,
-    candidate_id INTEGER NOT NULL REFERENCES Candidate(candidate_id),
+    user_id INTEGER NOT NULL REFERENCES User(user_id),
     form_id INTEGER NOT NULL REFERENCES Form(form_id),
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -44,7 +44,7 @@ CREATE TABLE FormEntry (
 -- Unified Answer table
 CREATE TABLE Answer (
     answer_id SERIAL PRIMARY KEY,
-    candidate_id INTEGER NOT NULL REFERENCES Candidate(candidate_id),
+    user_id INTEGER NOT NULL REFERENCES User(user_id),
     question_id INTEGER NOT NULL REFERENCES Question(question_id),
     answer_type question_type_enum NOT NULL,
     response_text TEXT,
@@ -58,7 +58,7 @@ CREATE TABLE Answer (
 -- Indexes for performance
 CREATE INDEX idx_form_recruiter ON Form(recruiter_id);
 CREATE INDEX idx_question_form ON Question(form_id);
-CREATE INDEX idx_entry_candidate ON FormEntry(candidate_id);
+CREATE INDEX idx_entry_user ON FormEntry(user_id);
 CREATE INDEX idx_entry_form ON FormEntry(form_id);
 CREATE INDEX idx_answer_question ON Answer(question_id);
-CREATE INDEX idx_answer_candidate ON Answer(candidate_id);
+CREATE INDEX idx_answer_user ON Answer(user_id);
