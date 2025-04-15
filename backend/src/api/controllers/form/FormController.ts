@@ -18,7 +18,7 @@ export const createForm = async (req: Request, res: Response) => {
   try {
     const { recruiter_id, title, description } = req.body;
     const form = { recruiter_id, title, description };
-    let insertedForm = await insertForm(form);
+    const insertedForm = await insertForm(form);
     res.status(201).json({ message: "Form created", insertedForm });
   } catch (error) {
     res.status(500).json({ message: "Failed to create Form", error: (error as Error).message });

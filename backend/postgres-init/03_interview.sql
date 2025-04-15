@@ -15,7 +15,6 @@ CREATE TABLE InterviewEntry (
   form_entry_id INTEGER NOT NULL,
   selected_by TEXT NOT NULL, -- referencing Recruiter(uuid)
   UNIQUE (interview_id, form_entry_id), -- Ensuring unique combination of interview_id and form_entry_id
-  FOREIGN KEY (interview_id) REFERENCES Interview(id),
   FOREIGN KEY (form_entry_id) REFERENCES FormEntry(id),
   FOREIGN KEY (selected_by) REFERENCES Recruiter(uuid)
 );

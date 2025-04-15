@@ -18,7 +18,8 @@ CREATE TABLE FormEntry (
   id SERIAL PRIMARY KEY,
   applicant_id INTEGER NOT NULL REFERENCES Applicant(id),
   form_id INTEGER NOT NULL REFERENCES Form(id),
-  submitted_at TIMESTAMP DEFAULT date_trunc('second', now())
+  submitted_at TIMESTAMP DEFAULT date_trunc('second', now()),
+  UNIQUE (form_id, applicant_id)
 );
 
 CREATE TABLE Answer (

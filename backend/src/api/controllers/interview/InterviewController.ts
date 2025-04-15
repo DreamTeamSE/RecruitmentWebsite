@@ -6,7 +6,7 @@ export const createInterview = async (req: Request, res: Response) => {
     try {
         const { form_id, created_by } = req.body;
         const interview = { form_id, created_by };
-        let inserted_interview = await insertInterview(interview);
+        const inserted_interview = await insertInterview(interview);
         console.log("Interview successfully created:", inserted_interview);
         res.status(201).json({ message: "Interview created", inserted_interview });
     } catch (error) {
