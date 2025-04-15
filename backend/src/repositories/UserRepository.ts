@@ -3,8 +3,8 @@ import psql_client from "../config/postgresClient";
 import  { Candidate } from '../model/user/Candidate';
 
 
-const insertCanidate = async (
-    canidate: {
+const insertUser = async (
+    user: {
         first_name : string, 
         last_name : string
     }
@@ -16,7 +16,7 @@ const insertCanidate = async (
             VALUES ($1, $2)
             RETURNING *;
         `;
-        const values = [canidate.first_name, canidate.last_name];
+        const values = [user.first_name, user.last_name];
         const result: QueryResult = await client.query(query, values);
         return result.rows[0]
     } finally {
@@ -24,4 +24,4 @@ const insertCanidate = async (
     }
 };
 
-export{ insertCanidate };
+export{ insertUser };

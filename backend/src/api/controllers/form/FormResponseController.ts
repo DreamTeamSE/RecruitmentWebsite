@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
-import { insertAnswerText, insertQuestion } from "../../../repositories/FormRepository"
+import { insertAnswerText, insertQuestion } from "../../../repositories/FormRepository";
 
 export const createQuestion = async (req: Request, res: Response) => {
   try {
     const { form_id, question_text, question_type, question_order } = req.body;
     const question_entry = { form_id, question_text, question_type, question_order };
     await insertQuestion(question_entry);
+    console.log("Question created successfully:", question_entry);
     res.status(201).json({ message: "Question created", question_entry });
   } catch (error) {
+    console.error("Error creating question:", (error as Error).message);
     res.status(500).json({ message: "Failed to create Question", error: (error as Error).message });
   }
 };
