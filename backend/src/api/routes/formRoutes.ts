@@ -8,7 +8,7 @@ const router = Router();
 router.get("/feed", getFeed)
 
 // POST /api/forms
-router.post("/create/application", createForm)
+router.post("/application", createForm)
 
 
 
