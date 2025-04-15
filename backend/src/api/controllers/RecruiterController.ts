@@ -7,8 +7,10 @@ export const createRecruiter = async (req: Request, res: Response) => {
         const { uuid, first_name, last_name } = req.body;
         const data = { uuid, first_name, last_name };
         const recruiter = await insertRecruiter(data);
-        res.status(201).json({messsage: "Recruited created", recruiter : recruiter});
+        console.log("Recruiter created successfully:", recruiter);
+        res.status(201).json({ messsage: "Recruiter created", recruiter: recruiter });
     } catch (error) {
+        console.error("Error creating recruiter:", (error as Error).message);
         res.status(500).json({ message: "Failed to create Recruiter", error: (error as Error).message });
     }
 };

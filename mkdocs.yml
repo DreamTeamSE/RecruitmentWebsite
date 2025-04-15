@@ -4,7 +4,7 @@ theme:
 
 nav:
   - Home: index.md
-  - Users: users.md
+  - Applicants: applicants.md
   - Applications: applications.md
   - Interviews: interviews.md
 

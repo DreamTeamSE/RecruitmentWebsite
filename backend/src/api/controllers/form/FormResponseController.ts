@@ -16,8 +16,8 @@ export const createQuestion = async (req: Request, res: Response) => {
 
 export const createAnswerText = async (req: Request, res: Response) => {
   try {
-    const { candidate_id, question_id, answer_type, response_text } = req.body;
-    const answer_entry = { candidate_id, question_id, answer_type, response_text };
+    const { applicant_id, question_id, answer_type, response_text } = req.body;
+    const answer_entry = { applicant_id, question_id, answer_type, response_text };
     await insertAnswerText(answer_entry);
     res.status(201).json({ message: "Answer created", answer_entry });
   } catch (error) {
