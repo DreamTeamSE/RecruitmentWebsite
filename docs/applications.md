@@ -30,11 +30,11 @@
 
 ## Table: `FormEntry`
 
-**Description**: Represents a candidate's submission of a form.
+**Description**: Represents a applicant's submission of a form.
 
 | Column Name   | Data Type | Constraints                          | Description                          |
 |---------------|-----------|--------------------------------------|--------------------------------------|
 | form_entry_id | SERIAL    | PRIMARY KEY                          | Unique identifier for each form entry |
-| candidate_id  | INTEGER   | NOT NULL, FOREIGN KEY                | References the candidate who submitted the form |
+| applicant_id  | INTEGER   | NOT NULL, FOREIGN KEY                | References the applicant who submitted the form |
 | form_id       | INTEGER   | NOT NULL, FOREIGN KEY                | References the form that was submitted |
 | submitted_at  | TIMESTAMP | DEFAULT now()                        | Timestamp when the form was submitted |

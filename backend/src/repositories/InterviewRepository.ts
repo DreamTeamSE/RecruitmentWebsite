@@ -45,5 +45,5 @@ const insertInterviewEntry = async (interview: InterviewEntry): Promise<Intervie
 }
 
 export default {
-    insertInterviewEntry
+    insertInterview, insertInterviewEntry
 }

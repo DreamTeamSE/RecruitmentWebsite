@@ -2,7 +2,7 @@
 
 Welcome to the database schema documentation. This documentation is divided into the following sections:
 
-- [Users](users.md)
+- [Applicants](applicants.md)
 - [Applications](applications.md)
 - [Interviews](interviews.md)
 
