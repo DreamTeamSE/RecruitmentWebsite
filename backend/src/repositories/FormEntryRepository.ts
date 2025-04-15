@@ -1,6 +1,5 @@
 import { QueryResult } from 'pg';
 import psql_client from "../config/postgresClient";
-import { Form } from '../model/application/Form';
 import { Question, QuestionType } from '../model/application/Question';
 import { Answer } from '../model/application/Answer';
 import { AnswerText } from '../model/application/AnswerText'
