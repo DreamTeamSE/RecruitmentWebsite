@@ -1,7 +1,7 @@
-import psql_client from "../config/postgresClient";
+import psql_client from "../../config/postgresClient";
 import { QueryResult } from 'pg';
-import { InterviewEntry } from '../model/interview/InterviewEntry';
-import { Interview } from '../model/interview/Interview';
+import { InterviewEntry } from '../../model/interview/InterviewEntry';
+import { Interview } from '../../model/interview/Interview';
 
 
 
