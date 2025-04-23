@@ -13,7 +13,7 @@ const insertRecruiter = async (
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO recruiter (uuid, first_name, last_name)
+            INSERT INTO Recruiters (uuid, first_name, last_name)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;

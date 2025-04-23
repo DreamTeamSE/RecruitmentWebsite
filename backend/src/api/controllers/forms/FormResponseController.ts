@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { insertFormEntry, } from "../../../repositories/forms/FormEntryRepository";
 import { insertQuestion, retrieveQuestions } from "../../../repositories/forms/QuestionEntryRepository";
-import { insertAnswerText } from "../../../repositories/forms/AnswerEntryRepository";
+import { insertAnswer, retrieveAnswer } from "../../../repositories/forms/AnswerEntryRepository";
 // Questions
 export const getQuestions = async (req: Request, res: Response) => {
   try {
-    const raw_form_id = req.params.form_id;
+    const raw_form_id = req.query.form_id;
     const formId = Number(raw_form_id);
 
     if (!raw_form_id || isNaN(formId)) {
@@ -39,11 +39,11 @@ export const createQuestion = async (req: Request, res: Response) => {
 
 
 // Answers
-export const createAnswerText = async (req: Request, res: Response) => {
+export const createAnswer = async (req: Request, res: Response) => {
   try {
-    const { applicant_id, question_id, answer_type, response_text } = req.body;
-    const answer_entry = { applicant_id, question_id, answer_type, response_text };
-    const inserted_answer_text = await insertAnswerText(answer_entry);
+    const { applicant_id, question_id, answer_type, answer_text, form_entry_id } = req.body;
+    const answer_entry = { answer_type, applicant_id, form_entry_id, question_id, answer_text  };
+    const inserted_answer_text = await insertAnswer(answer_entry);
     console.log("Answer created successfully:", inserted_answer_text);
     res.status(201).json({ message: "Answer created", answer : inserted_answer_text });
   } catch (error) {
@@ -52,6 +52,25 @@ export const createAnswerText = async (req: Request, res: Response) => {
   }
 };
 
+
+export const getAnswersByFormEntryId = async (req: Request, res: Response) => {
+  try {
+    const raw_form_entry_id = req.query.form_entry_id;
+    const formId = Number(raw_form_entry_id);
+
+    if (!raw_form_entry_id || isNaN(formId)) {
+      res.status(400).json({ message: "Invalid or missing form_id. It must be a number." });
+    }
+
+    const retrievedAnswers = await retrieveAnswer(formId);
+
+
+    res.status(200).json({ message: "Answers retrieved", answers: retrievedAnswers });
+  } catch (error) {
+    console.error("Error retrieving Answers:", (error as Error).message);
+    res.status(500).json({ message: "Failed to retrieve Answers", error: (error as Error).message });
+  }
+};
 
 // Form
 export const createFormEntry = async (req: Request, res: Response) => {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertApplicant } from '../../repositories/user/ApplicantRepository'
+import { insertApplicant } from "../../../repositories/user/ApplicantRepository";
 
 export const createApplicant = async (req: Request, res: Response) => {
     try {

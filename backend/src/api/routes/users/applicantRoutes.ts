@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createApplicant } from '../../users/ApplicantController';
+import { createApplicant } from '../../controllers/users/ApplicantController';
 const router = Router();
 
 

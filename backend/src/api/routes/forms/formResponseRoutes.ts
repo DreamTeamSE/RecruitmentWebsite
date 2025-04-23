@@ -1,16 +1,16 @@
 import { Router } from 'express';
 
-import { createQuestion, createAnswerText, createFormEntry, getQuestions } from '../../controllers/forms/FormResponseController';
+import { createQuestion, createAnswer, createFormEntry, getQuestions, getAnswersByFormEntryId } from '../../controllers/forms/FormResponseController';
 
 const router = Router();
 
 
-// Post /api/form/entry
+// Post /api/forms/entry
 router.post("/application", createFormEntry)
-router.post("/answer/text", createAnswerText)
+router.post("/answer/text", createAnswer)
 router.post("/question", createQuestion)
 // Get /api/forms/entry
-router.get("/question/:form_id", getQuestions);
-
+router.get("/question", getQuestions);
+router.get("/answer", getAnswersByFormEntryId)
 
 export default router;

@@ -4,7 +4,7 @@ import formRouter from './forms/formRoutes';
 import recruiterRouter from './users/recruiterRoutes'
 import applicantRouter from './users/applicantRoutes'
 import formResponseRoutes from './forms/formResponseRoutes'
-import interviewRoutes from './interview/interviewRoutes'
+import interviewRoutes from './interviews/interviewRoutes'
 
 
 const router = Router();

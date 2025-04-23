@@ -10,7 +10,7 @@ const insertFormEntry = async (form_entry : {
     const client = await psql_client.connect()
     try {
         const query = `
-            INSERT INTO formentry (applicant_id, form_id)
+            INSERT INTO FormEntries (applicant_id, form_id)
             VALUES ($1, $2)
             RETURNING *;
         `;

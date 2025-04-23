@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createInterview, createInterviewEntry } from '../controllers/interview/InterviewController';
+import { createInterview, createInterviewEntry } from '../../controllers/interviews/InterviewController';
 const router = Router();
 
 

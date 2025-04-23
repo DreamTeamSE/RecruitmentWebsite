@@ -12,7 +12,7 @@ const insertApplicant = async (
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO applicant (first_name, last_name)
+            INSERT INTO Applicants (first_name, last_name)
             VALUES ($1, $2)
             RETURNING *;
         `;

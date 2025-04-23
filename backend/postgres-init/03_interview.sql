@@ -1,5 +1,5 @@
 -- Interview table
-CREATE TABLE Interview (
+CREATE TABLE Interviews (
   id SERIAL PRIMARY KEY,
   form_id INTEGER NOT NULL UNIQUE, -- Ensuring one interview per form entry
   created_by TEXT NOT NULL, -- referencing Recruiter(uuid), which is TEXT
@@ -9,7 +9,7 @@ CREATE TABLE Interview (
 );
 
 -- InterviewEntry table
-CREATE TABLE InterviewEntry (
+CREATE TABLE InterviewEntries (
   id SERIAL PRIMARY KEY,
   interview_id INTEGER NOT NULL,
   form_entry_id INTEGER NOT NULL,

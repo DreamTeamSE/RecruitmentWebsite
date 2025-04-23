@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createRecruiter } from '../controllers/RecruiterController';
+import { createRecruiter } from '../../controllers/users/RecruiterController'
 const router = Router();
 
 
