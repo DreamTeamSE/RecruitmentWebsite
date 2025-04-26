@@ -1,7 +1,7 @@
-import psql_client from "../config/postgresClient";
+import psql_client from "../../config/postgresClient";
 import { QueryResult } from 'pg';
-import { InterviewEntry } from '../model/interview/InterviewEntry';
-import { Interview } from '../model/interview/Interview';
+import { InterviewEntry } from '../../model/interview/InterviewEntry';
+import { Interview } from '../../model/interview/Interview';
 
 
 
@@ -11,7 +11,7 @@ const insertInterview = async (interview: {
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO Interview  (form_id, created_by)
+            INSERT INTO Interviews (form_id, created_by)
             VALUES ($1, $2)
             RETURNING *;
         `;
@@ -35,7 +35,7 @@ const insertInterviewEntry = async (interviewEntry: {
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO InterviewEntry  (interview_id, form_entry_id, selected_by)
+            INSERT INTO InterviewEntries  (interview_id, form_entry_id, selected_by)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertForm, selectFeed } from "../../../repositories/FormRepository";
+import { insertForm, selectFeed } from "../../../repositories/forms/FormRepository";
 
 // GET /forms
 export const getFeed = async (req: Request, res: Response) => {

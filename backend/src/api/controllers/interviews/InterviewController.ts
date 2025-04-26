@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertInterview, insertInterviewEntry } from "../../../repositories/InterviewRepository";
+import { insertInterview, insertInterviewEntry } from "../../../repositories/interview/InterviewRepository";
 
 // POST /page
 export const createInterview = async (req: Request, res: Response) => {

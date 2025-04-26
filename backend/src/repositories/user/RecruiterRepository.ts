@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
-import psql_client from "../config/postgresClient";
-import Recruiter from '../model/user/Recruiter';
+import psql_client from "../../config/postgresClient";
+import Recruiter from '../../model/user/Recruiter';
 
 
 const insertRecruiter = async (
@@ -13,7 +13,7 @@ const insertRecruiter = async (
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO recruiter (uuid, first_name, last_name)
+            INSERT INTO Recruiters (uuid, first_name, last_name)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;

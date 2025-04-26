@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import formRouter from './formRoutes';
-import recruiterRouter from './recruiterRoutes'
-import applicantRouter from './applicantRoutes'
-import formResponseRoutes from './formResponseRoutes'
-import interviewRoutes from './interviewRoutes'
+import formRouter from './forms/formRoutes';
+import recruiterRouter from './users/recruiterRoutes'
+import applicantRouter from './users/applicantRoutes'
+import formResponseRoutes from './forms/formResponseRoutes'
+import interviewRoutes from './interviews/interviewRoutes'
 
 
 const router = Router();

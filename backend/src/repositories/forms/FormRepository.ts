@@ -1,6 +1,6 @@
 import { QueryResult } from 'pg';
-import psql_client from "../config/postgresClient";
-import { Form } from '../model/application/Form';
+import psql_client from "../../config/postgresClient";
+import { Form } from '../../model/application/Form';
 
 const insertForm = async (
     form: { recruiter_id: string; title: string; description: string }
@@ -8,7 +8,7 @@ const insertForm = async (
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO form (recruiter_id, title, description)
+            INSERT INTO Forms (recruiter_id, title, description)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;
@@ -22,7 +22,7 @@ const insertForm = async (
 
 const selectFeed = async (): Promise<Form[]> => {
     const query = `
-        SELECT * FROM form;
+        SELECT * FROM Forms;
     `;
     const client = await psql_client.connect();
     try {
