@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Vision() {
     return (
       <div className="flex flex-col items-center justify-center p-6 pt-[64px]">
@@ -12,17 +14,17 @@ export default function Vision() {
   
   
         {/* Tagline */}
-        <h2 className="h2 font-semibold mt-[48px] text-center">
+        <h2 className="text-center">
           From Vision to Impact
         </h2>
   
         {/* Join Button */}
-        <div className="mt-[24px]">
-          <a href="/apply">
-            <button className="bg-primary hover:bg-primary/90 text-white md:text-[1.5em] sm:text-[1.25em] text-[em] font-semibold py-[.125em] px-[4.5em] rounded-xl">
+        <div>
+          <Link href="/applications">
+            <button className="bg-primary hover:bg-primary/90 text-white md:text-[1.5em] sm:text-[1.25em] text-[em] py-[.125em] px-[4.5em] rounded-xl">
               Join Today
             </button>
-          </a>
+          </Link>
         </div>
       </div>
     );
