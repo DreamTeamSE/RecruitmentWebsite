@@ -4,7 +4,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import ApplicationReviewClientPage, { type Applicant } from '@/components/applications/ApplicationReviewPage';
-import { allApplicationTypesForReview } from '@/lib/data/applicantIDData';
+import { allApplicationTypesForReview } from '@/lib/data/applicant/applicantIDData';
 
 // Extracts the simplified Applicant[] list for the client component
 function getApplicationReviewData(applicationId: string): {

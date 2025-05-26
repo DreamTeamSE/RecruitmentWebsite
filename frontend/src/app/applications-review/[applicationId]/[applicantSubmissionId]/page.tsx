@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 import { 
   getIndividualApplicantReviewDisplayData, 
   allApplicationTypesForReview // Used for generateStaticParams
-} from '@/lib/data/applicantIDData'; // Adjust path as needed
+} from '@/lib/data/applicant/applicantIDData'; // Adjust path as needed
 
 // generateStaticParams for this nested dynamic route
 export async function generateStaticParams() {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 // Assuming types are in a shared file, adjust path if they are defined elsewhere
 // These types should match those defined in your data source (e.g., applicantReviewDetailData.ts)
-import type { IndividualReviewPageDisplayData, ApplicantAnswer, ApplicationQuestion } from '@/lib/data/applicantIDData'; // Adjust path as needed
+import type { IndividualReviewPageDisplayData, ApplicantAnswer, ApplicationQuestion } from '@/lib/data/applicant/applicantIDData'; // Adjust path as needed
 import { useRouter } from 'next/navigation'; // For client-side navigation
 
 interface IndividualApplicantReviewDisplayProps {
@@ -157,27 +157,6 @@ export default function IndividualApplicantReviewDisplay({ reviewData, applicati
             </div>
         </div>
 
-        {/* Navigation Arrows for Previous/Next Applicant */}
-        <div className="flex justify-between items-center mt-10 sm:mt-12">
-          <Button 
-            variant="outline" 
-            size="lg" 
-            onClick={() => navigateToApplicant(previousApplicantSubmissionId)} 
-            disabled={!previousApplicantSubmissionId} 
-            className="rounded-md bg-background text-foreground hover:bg-muted/50"
-          >
-            <ArrowLeft className="mr-2 h-5 w-5" /> Previous Applicant
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg" 
-            onClick={() => navigateToApplicant(nextApplicantSubmissionId)} 
-            disabled={!nextApplicantSubmissionId} 
-            className="rounded-md bg-background text-foreground hover:bg-muted/50"
-          >
-            Next Applicant <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
       </div>
     </section>
   );
