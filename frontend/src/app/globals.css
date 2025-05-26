@@ -1,136 +1,224 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import "tailwindcss"; /* User-specified import method */
+@import "tw-animate-css"; /* Make sure this path is correct or the import method is appropriate */
 
-
-
-/* Optional: custom variant */
-@custom-variant dark (&:is(.dark *));
-
-
+/*
+  Optional: custom variant - This is non-standard CSS.
+  It might be for a specific PostCSS plugin or preprocessor.
+  If not, it should be removed or implemented using standard CSS/Tailwind techniques.
+*/
+/* @custom-variant dark (&:is(.dark *)); */
 
 :root {
-  /* Colors */
-  --primary: #4A6DFF;
-  --secondary: #E763A5;
-  --accent: #D9261C;
-  --secondary-accent: #92C4E8;
-  --background: #FFFFFF;
-  --foreground: #000000;
-  --radius: 0.625rem;
+  /* Color Palette (HSL values are now correctly derived from common hex representations) */
+  --primary: 226 100% 64%;    /* approx #4A6DFF */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --secondary: 328 76% 64%;  /* approx #E763A5 */
+  --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+  --accent: 4 70% 49%;       /* approx #D9261C */
+  --accent-foreground: 0 0% 100%;    /* #FFFFFF - White text on red accent */
+  --secondary-accent: 205 70% 74%; /* approx #92C4E8 */
+  --secondary-accent-foreground: 0 0% 0%; /* #000000 - Black text on light blue secondary-accent */
 
-  /* Font families */
+  --background: 0 0% 100%;   /* #FFFFFF */
+  --foreground: 0 0% 0%;     /* #000000 */
+
+  --muted: 0 0% 96.1%;     /* #F5F5F5 */
+  --muted-foreground: 215 16% 47%; /* #6B7280 */
+
+  --destructive: 0 84% 47%;  /* approx #DC2626 */
+  --destructive-foreground: 0 0% 100%; /* #FFFFFF - White text on red destructive */
+
+  --border: 220 13% 91%;     /* approx #E5E7EB */
+  --input: 220 13% 91%;      /* approx #E5E7EB - Often same as border */
+  --ring: 226 100% 64%;      /* approx #4A6DFF - Same as primary */
+
+  /* Radius */
+  --radius: 0.625rem; /* 10px */
+
+  /* Font Families */
   --font-sans: 'Outfit', sans-serif;
   --font-serif: 'DM Serif Display', serif;
+  --font-mono: 'Geist Mono', monospace;
 
-  /* Other tokens */
-  --primary-foreground: #FFFFFF;
-  --secondary-foreground: #FFFFFF;
-  --muted: #F5F5F5;
-  --muted-foreground: #6B7280;
-  --destructive: #DC2626;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #4A6DFF;
+  /* Card (often used by shadcn/ui) */
+  --card: var(--background);
+  --card-foreground: var(--foreground);
 
-  /* Sidebar colors */
+  /* Popover (often used by shadcn/ui) */
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+
+  /* Sidebar specific colors (example) */
   --sidebar: var(--background);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--secondary-accent);
-  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-accent-foreground: var(--secondary-accent-foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 }
 
-/* Optional theme mapping */
-@theme inline {
-  --color-background: var(--background);
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --color-secondary-accent: var(--secondary-accent);
-  --color-foreground: var(--foreground);
-  --color-card: var(--background);
-  --color-card-foreground: var(--foreground);
-  --color-popover: var(--background);
-  --color-popover-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark mode variables using .dark class selector */
+.dark {
+  --primary: 205 70% 74%;    /* approx #92C4E8 */
+  --primary-foreground: 0 0% 0%;   /* #000000 */
+  --secondary: 328 76% 64%;  /* approx #E763A5 (can be same as light or adjusted) */
+  --secondary-foreground: 0 0% 0%;   /* #000000 */
+  --accent: 4 70% 49%;       /* approx #D9261C (can be same or adjusted) */
+  --accent-foreground: 0 0% 100%;    /* #FFFFFF */
+  --secondary-accent: 226 100% 64%; /* approx #4A6DFF */
+  --secondary-accent-foreground: 0 0% 100%; /* #FFFFFF */
+
+  --background: 0 0% 0%;     /* #000000 */
+  --foreground: 0 0% 100%;   /* #FFFFFF */
+
+  --card: 215 28% 17%;       /* approx #1F2937 - Dark card */
+  --card-foreground: 0 0% 100%;   /* #FFFFFF */
+  --popover: 215 28% 17%;      /* approx #1F2937 */
+  --popover-foreground: 0 0% 100%;   /* #FFFFFF */
+
+  --muted: 215 14% 26%;       /* approx #374151 */
+  --muted-foreground: 215 10% 65%; /* approx #9CA3AF */
+
+  --destructive: 0 90% 71%;  /* approx #F87171 - Lighter red for dark mode */
+  --destructive-foreground: 0 0% 0%;   /* #000000 - Black text on light red */
+
+  --border: 215 14% 26%;       /* approx #374151 */
+  --input: 215 14% 26%;       /* approx #374151 */
+  --ring: 205 70% 74%;        /* approx #92C4E8 - Same as dark primary */
+
+  /* Sidebar dark */
+  --sidebar: 215 28% 17%;       /* approx #1F2937 */
+  --sidebar-foreground: 0 0% 100%;   /* #FFFFFF */
+  --sidebar-primary: 205 70% 74%;    /* approx #92C4E8 */
+  --sidebar-primary-foreground: 0 0% 0%;   /* #000000 */
+  --sidebar-accent: 328 76% 64%;  /* approx #E763A5 */
+  --sidebar-accent-foreground: 0 0% 0%;   /* #000000 */
+  --sidebar-border: 215 21% 29%;     /* approx #4B5563 - Example dark border */
+  --sidebar-ring: 205 70% 74%;        /* approx #92C4E8 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #FFFFFF;
-    --card: #1F2937;
-    --card-foreground: #FFFFFF;
-    --popover: #1F2937;
-    --popover-foreground: #FFFFFF;
-    --primary: #92C4E8;
-    --secondary: #E763A5;
-    --accent: #D9261C;
-    --secondary-accent: #4A6DFF;
-    --primary-foreground: #000000;
-    --secondary-foreground: #000000;
-    --muted: #374151;
-    --muted-foreground: #9CA3AF;
-    --destructive: #F87171;
-    --border: #374151;
-    --input: #374151;
-    --ring: #92C4E8;
-
-    /* Sidebar */
-    --sidebar: #1F2937;
-    --sidebar-foreground: #FFFFFF;
-    --sidebar-primary: #92C4E8;
-    --sidebar-primary-foreground: #000000;
-    --sidebar-accent: #E763A5;
-    --sidebar-accent-foreground: #000000;
-    --sidebar-border: #4B5563;
-    --sidebar-ring: #92C4E8;
-  }
-}
+/*
+  The @tailwind directives are typically used instead of @import "tailwindcss";
+  If you are using @import "tailwindcss"; at the top, these might be redundant
+  or conflict depending on your PostCSS setup.
+  For standard Next.js + Tailwind, only the @tailwind directives are needed.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
     box-sizing: border-box;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background)); /* Use CSS variable directly */
+    color: hsl(var(--foreground)); /* Use CSS variable directly */
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
+    font-weight: 400; /* Equivalent to font-normal */
   }
 
   h1 {
-    @apply text-[2rem] sm:text-[2.25rem] md:text-[3rem] font-normal mb-[1rem] mt-[1rem];
+    font-size: 2rem; /* 32px */
+    line-height: 2.5rem; /* leading-tight for 2rem */
+    margin-top: 1rem; /* my-4 */
+    margin-bottom: 1rem; /* my-4 */
   }
-  
-
+  @media (min-width: 640px) { /* sm breakpoint */
+    h1 {
+      font-size: 2.5rem; /* 40px */
+      line-height: 2.75rem; /* leading-tight for 2.5rem */
+    }
+  }
+  @media (min-width: 768px) { /* md breakpoint */
+    h1 {
+      font-size: 3rem; /* 48px */
+      line-height: 1; /* leading-tight for 3rem is often 1 or very close */
+    }
+  }
 
   h2 {
-    @apply text-[1.5rem] sm:text-[2rem] md:text-[2.5rem] font-normal mb-[1rem] mt-[1rem];
+    font-size: 1.75rem; /* 28px */
+    line-height: 2.25rem; /* leading-snug for 1.75rem */
+    margin-top: 1rem; /* my-4 */
+    margin-bottom: 1rem; /* my-4 */
   }
-  
+  @media (min-width: 640px) { /* sm breakpoint */
+    h2 {
+      font-size: 2rem; /* 32px */
+      line-height: 2.5rem; /* leading-snug for 2rem */
+    }
+  }
+  @media (min-width: 768px) { /* md breakpoint */
+    h2 {
+      font-size: 2.5rem; /* 40px */
+      line-height: 2.75rem; /* leading-snug for 2.5rem */
+    }
+  }
+
   h3 {
-    @apply text-[1.25rem] sm:text-[1.5rem] md:text-[1.75rem] font-normal mb-[.75rem] mt-[.75rem];
+    font-size: 1.5rem; /* 24px */
+    line-height: 2rem; /* leading-normal for 1.5rem */
+    margin-top: 0.75rem; /* my-3 */
+    margin-bottom: 0.75rem; /* my-3 */
+  }
+  @media (min-width: 640px) { /* sm breakpoint */
+    h3 {
+      font-size: 1.75rem; /* 28px */
+      line-height: 2.25rem; /* leading-normal for 1.75rem */
+    }
+  }
+  @media (min-width: 768px) { /* md breakpoint */
+    h3 {
+      font-size: 2rem; /* 32px */
+      line-height: 2.5rem; /* leading-normal for 2rem */
+    }
   }
 
   h4 {
-    @apply text-[1.125rem] sm:text-[1.25rem] md:text-[1.5rem] font-normal mb-[.75rem] mt-[.75rem];
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem; /* leading-normal for 1.25rem */
+    margin-top: 0.75rem; /* my-3 */
+    margin-bottom: 0.75rem; /* my-3 */
   }
-  
+  @media (min-width: 640px) { /* sm breakpoint */
+    h4 {
+      font-size: 1.5rem; /* 24px */
+      line-height: 2rem; /* leading-normal for 1.5rem */
+    }
+  }
+  @media (min-width: 768px) { /* md breakpoint */
+    h4 {
+      font-size: 1.75rem; /* 28px */
+      line-height: 2.25rem; /* leading-normal for 1.75rem */
+    }
+  }
+
   p {
-    @apply text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] font-normal my-[1rem];
+    font-size: 1rem; /* 16px */
+    line-height: 1.75rem; /* leading-relaxed for 1rem */
+    margin-top: 1rem; /* my-4 */
+    margin-bottom: 1rem; /* my-4 */
+  }
+  @media (min-width: 640px) { /* sm breakpoint */
+    p {
+      font-size: 1.125rem; /* 18px */
+      line-height: 2rem; /* leading-relaxed for 1.125rem */
+    }
+  }
+
+  *:focus-visible {
+    outline: none;
+    /* Creates a 2px ring with the --ring color, offset by a 2px gap matching the --background color */
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
   }
 }

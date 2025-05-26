@@ -1,13 +1,17 @@
-import Branches from "@/components/home/Branches";
 import Vision from "@/components/home/Vison";
-import WhoWeAre from "@/components/home/WhoWeAre";
+import Carousel from "@/components/home/Carousel";
+import ExploreMoreSection from "@/components/home/ExploreMoreSection";
+import WhyDTESection from "@/components/home/WhyDTE";
+import Testimonial from "@/components/home/Testimonial";
 
 export default function Page() {
   return (
     <>
       <Vision />
-      <WhoWeAre />
-      <Branches />
+      <Carousel />
+      <WhyDTESection />
+      <ExploreMoreSection />
+      <Testimonial />
     </>
   );
 }
