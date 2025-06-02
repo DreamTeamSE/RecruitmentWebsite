@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import ApplicationDetailPageContent, { applicationsData, ApplicationData } from '@/components/involved/join-dte/ApplicationTemplate'; // Adjust path if needed
+import ApplicationDetailPageContent, { ApplicationData } from '@/components/involved/join-dte/ApplicationTemplate'; // Adjust path if needed
+import { applicationsData } from '@/lib/data/application/application';
 import { notFound } from 'next/navigation';
 
 interface PageProps {

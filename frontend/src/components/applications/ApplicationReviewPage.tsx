@@ -5,22 +5,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Search, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-
+import { Applicant, ApplicationReviewClientPageProps } from '@/models/types/application';
 // Define the structure for an individual applicant
-export interface Applicant {
-  id: string;
-  name: string;
-  appliedDate: string;
-  score?: number;
-  applicationLink?: string; // Link to the full application details of this applicant
-}
 
-// Props for the client component
-interface ApplicationReviewClientPageProps {
-  applicationName: string;
-  applicationTerm: string;
-  submittedApplicants: Applicant[];
-}
 
 const ApplicantCard: React.FC<Applicant> = ({ name, appliedDate, score, applicationLink }) => {
   return (
@@ -51,7 +38,7 @@ export default function ApplicationReviewClientPage({
   submittedApplicants
 }: ApplicationReviewClientPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterOption, setFilterOption] = useState('All Applications');
+  const [filterOption] = useState('All Applications');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 

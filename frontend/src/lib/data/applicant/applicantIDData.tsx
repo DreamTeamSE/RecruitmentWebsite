@@ -1,50 +1,5 @@
 // src/lib/data/applicantReviewDetailData.ts
-
-// Defines the structure of a question for a specific application type
-export interface ApplicationQuestion {
-  id: string; // Unique ID for the question within its application type (e.g., "sw-q1", "ds-q1")
-  questionText: string;
-  type: 'text' | 'textarea'; // Type might be relevant for how answers are displayed or were collected
-}
-
-// Defines an applicant's answer to a specific question
-export interface ApplicantAnswer {
-  questionId: string; // Corresponds to ApplicationQuestion.id
-  answer: string;
-}
-
-// Defines the structure for a single applicant's submission
-export interface ApplicantSubmission {
-  id: string; // Applicant's unique submission ID (e.g., "max-martin-sw")
-  firstName: string;
-  lastName: string;
-  email?: string;
-  appliedDate?: string;
-  answers: ApplicantAnswer[]; // Array of answers provided by the applicant
-  // Fields for reviewer - these would typically be saved/fetched from a database for persistence
-  currentNotes?: string;
-  currentScore?: string; // e.g., "10/10" or a numerical score
-}
-
-// Represents a specific type of application (e.g., Software Fall 2025)
-// This structure will hold the questions for that application type and all submissions to it.
-export interface ApplicationTypeForReview {
-  id: string; // Unique ID for this application type (e.g., "software-fall-2025") - This MUST match the [applicationId] from the URL
-  name: string; // e.g., "Software"
-  term: string; // e.g., "Fall 2025"
-  questions: ApplicationQuestion[]; // The set of questions for this application type
-  submissions: ApplicantSubmission[]; // All submissions for this application type
-}
-
-// This is the combined data structure that the individual review page component will expect as a prop
-export interface IndividualReviewPageDisplayData {
-  applicationName: string;
-  applicationTerm: string;
-  applicantSubmission: ApplicantSubmission;
-  applicationQuestions: ApplicationQuestion[]; // The original questions to display alongside answers
-  previousApplicantSubmissionId?: string; // For "Previous Applicant" button
-  nextApplicantSubmissionId?: string;   // For "Next Applicant" button
-}
+import { ApplicationQuestion, ApplicationTypeForReview, IndividualReviewPageDisplayData } from '@/models/types/application';
 
 // --- SAMPLE DATA ---
 // This would be fetched dynamically in a real application from your database/backend.

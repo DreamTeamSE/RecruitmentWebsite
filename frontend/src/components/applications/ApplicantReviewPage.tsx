@@ -3,22 +3,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from 'lucide-react';
 // Assuming types are in a shared file, adjust path if they are defined elsewhere
 // These types should match those defined in your data source (e.g., applicantReviewDetailData.ts)
-import type { IndividualReviewPageDisplayData, ApplicantAnswer, ApplicationQuestion } from '@/lib/data/applicant/applicantIDData'; // Adjust path as needed
-import { useRouter } from 'next/navigation'; // For client-side navigation
+import type { IndividualApplicantReviewDisplayProps } from '@/models/types/application'; // Adjust path as needed
 
-interface IndividualApplicantReviewDisplayProps {
-  reviewData: IndividualReviewPageDisplayData;
-  // The applicationId is the ID of the application type (e.g., "software-fall-2025")
-  // It's needed to construct correct URLs for prev/next navigation.
-  applicationTypeId: string;
-}
+
 
 export default function IndividualApplicantReviewDisplay({ reviewData, applicationTypeId }: IndividualApplicantReviewDisplayProps) {
-  const { applicationName, applicationTerm, applicantSubmission, applicationQuestions, previousApplicantSubmissionId, nextApplicantSubmissionId } = reviewData;
-  const router = useRouter();
+  const { applicationName, applicationTerm, applicantSubmission, applicationQuestions } = reviewData;
 
   // State for reviewer's notes and score
   const [notes, setNotes] = useState(applicantSubmission.currentNotes || '');
@@ -54,13 +46,6 @@ export default function IndividualApplicantReviewDisplay({ reviewData, applicati
     console.log("Saving review for applicant:", applicantSubmission.id, "in application type:", applicationTypeId, { notes, score });
     alert("Review saved (check console for data)! This is a demo and data is not persisted.");
     // You might want to provide feedback to the user, e.g., a success toast.
-  };
-
-  const navigateToApplicant = (targetApplicantSubmissionId?: string) => {
-    if (targetApplicantSubmissionId) {
-      // Construct the URL for the target applicant within the same application type
-      router.push(`/applications-review/${applicationTypeId}/${targetApplicantSubmissionId}`);
-    }
   };
 
   return (

@@ -4,52 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; // Import Link for navigation
 
-// Interface for the item data
-interface ExploreItemProps {
-  id: string;
-  imageSrc: string;
-  imageAlt: string;
-  title: string;
-  href: string; // Link for the item
-  align: 'left' | 'right'; // For staggering
-}
-
-// Data for the items
-// Replace placeholder imageSrc with actual paths from your /public folder or a CDN
-const exploreItemsData: ExploreItemProps[] = [
-  {
-    id: "design",
-    imageSrc: "https://placehold.co/600x400/A5B4FC/FFFFFF?text=Design&font=outfit",
-    imageAlt: "Design team working",
-    title: "Design",
-    href: "/branches/design", // Example link
-    align: 'left',
-  },
-  {
-    id: "software",
-    imageSrc: "https://placehold.co/600x400/A5B4FC/FFFFFF?text=Software&font=outfit",
-    imageAlt: "Software development screen",
-    title: "Software",
-    href: "/branches/software", // Example link
-    align: 'right',
-  },
-  {
-    id: "research",
-    imageSrc: "https://placehold.co/600x400/A5B4FC/FFFFFF?text=Research&font=outfit",
-    imageAlt: "Researcher pointing at a graph",
-    title: "Research",
-    href: "/branches/research", // Example link
-    align: 'left',
-  },
-  {
-    id: "shadowing",
-    imageSrc: "https://placehold.co/600x400/A5B4FC/FFFFFF?text=Shadowing&font=outfit",
-    imageAlt: "Group photo representing shadowing",
-    title: "Shadowing",
-    href: "/branches/shadowing", // Example link
-    align: 'right',
-  },
-];
+import { ExploreItemProps } from '@/models/types/home';
+import { exploreItemsData } from '../../lib/data/home/exploreItemsData';
 
 // Reusable Explore Item Component
 const ExploreItem: React.FC<ExploreItemProps> = ({ imageSrc, imageAlt, title, href, align }) => { // Removed isLast prop

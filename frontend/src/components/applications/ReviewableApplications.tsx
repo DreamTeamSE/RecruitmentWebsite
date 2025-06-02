@@ -5,30 +5,8 @@ import Link from 'next/link'; // For making application names clickable (optiona
 // You might want an icon for an "Apply Now" button or similar if needed
 // import { ArrowRight } from 'lucide-react';
 
-interface Application {
-  id: string;
-  name: string;
-  term: string;
-  deadline?: string; // For open applications
-  closedDate?: string; // For closed applications
-  status: 'open' | 'closed';
-  href: string; // Link to the application page or form
-}
-
-// Placeholder data - replace with your actual application details
-const applicationsData: Application[] = [
-  // Open Applications
-  { id: "gs-fall-2025", name: "General Shadowing", term: "Fall 2025", deadline: "9/10/25", status: "open", href: "/applications-review/gs-fall-2025" },
-  { id: "design-fall-2025", name: "Design", term: "Fall 2025", deadline: "9/10/25", status: "open", href: "/applications-review/design-fall-2025" },
-  { id: "research-fall-2025", name: "Research", term: "Fall 2025", deadline: "9/10/25", status: "open", href: "/applications-review/research-fall-2025" },
-  { id: "software-fall-2025", name: "Software", term: "Fall 2025", deadline: "9/10/25", status: "open", href: "/applications-review/software-fall-2025" },
-  { id: "stem-events-fall-2025", name: "Stem Special Events", term: "Fall 2025", deadline: "9/10/25", status: "open", href: "/applications-review/stem-events-fall-2025" },
-  // Closed Applications
-  { id: "gs-fall-2024", name: "General Shadowing", term: "Fall 2024", closedDate: "9/10/24", status: "closed", href: "/applications-review/gs-fall-2024" },
-  { id: "design-fall-2024", name: "Design", term: "Fall 2024", closedDate: "9/10/24", status: "closed", href: "/applications-review/design-fall-2024" },
-  { id: "research-fall-2024", name: "Research", term: "Fall 2024", closedDate: "9/10/24", status: "closed", href: "/applications-review/research-fall-2024" },
-  { id: "software-fall-2024", name: "Software", term: "Fall 2024", closedDate: "9/10/24", status: "closed", href: "/applications-review/software-fall-2024" },
-];
+import { Application } from '@/models/types/application';
+import { applicationsData } from '@/lib/data/application/application';
 
 const ApplicationCard: React.FC<Application> = ({ name, term, deadline, closedDate, status, href }) => {
   return (
