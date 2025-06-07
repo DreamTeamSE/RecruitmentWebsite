@@ -33,4 +33,26 @@ const selectFeed = async (): Promise<Form[]> => {
     }
 }
 
+export const updateFormById = async (formId: number, formData: any) => {
+  const query = `
+    UPDATE forms 
+    SET title = $1, description = $2, updated_at = NOW()
+    WHERE id = $3 
+    RETURNING *
+  `;
+  
+  const values = [formData.title, formData.description, formId];
+  
+  try {
+    const result = await psql_client.query(query, values);
+    if (result.rows.length === 0) {
+      throw new Error(`Form with id ${formId} not found`);
+    }
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error updating form:', error);
+    throw error;
+  }
+};
+
 export{ insertForm, selectFeed };

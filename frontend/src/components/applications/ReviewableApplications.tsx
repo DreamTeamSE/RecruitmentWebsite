@@ -1,72 +1,136 @@
 "use client";
 
 import React from 'react';
-import Link from 'next/link'; // For making application names clickable (optional)
-// You might want an icon for an "Apply Now" button or similar if needed
-// import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
 
-import { Application } from '@/models/types/application';
-import { applicationsData } from '@/lib/data/application/application';
+// Edit icon component
+const EditIcon = () => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="16" 
+    height="16" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className="h-4 w-4"
+  >
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+);
 
-const ApplicationCard: React.FC<Application> = ({ name, term, deadline, closedDate, status, href }) => {
+const ReviewableApplicationCard: React.FC<ApplicationFormData> = ({ id, title, description, created_at }) => {
+  const formattedDate = new Date(created_at).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
-    <Link href={href} className="block group">
-      <div className="bg-background p-4 sm:p-6 rounded-[var(--radius)] shadow-md hover:shadow-lg transition-shadow duration-300">
-        <h3 className="text-base sm:text-lg font-semibold text-primary group-hover:underline mb-1">
-          {name} | {term}
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative group">
+      {/* Edit button - positioned absolutely in top right */}
+      <Link 
+        href={`/applications-review/${id}/edit`} 
+        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100"
+        onClick={(e) => e.stopPropagation()}
+        title="Edit application form"
+      >
+        <EditIcon />
+      </Link>
+
+      {/* Main content - wrapped in Link for navigation */}
+      <Link href={`/applications-review/${id}`} className="block">
+        <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 mb-2 pr-12">
+          {title}
         </h3>
-        {status === 'open' && deadline && (
-          <p className="text-sm text-muted-foreground">Deadline: {deadline}</p>
-        )}
-        {status === 'closed' && closedDate && (
-          <p className="text-sm text-muted-foreground">Closed: {closedDate}</p>
-        )}
-      </div>
-    </Link>
+        <p className="text-gray-600 text-sm mb-3">{description}</p>
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-gray-500">Created: {formattedDate}</span>
+          <span className="text-sm font-medium text-blue-600 hover:text-blue-800">
+            View Submissions →
+          </span>
+        </div>
+      </Link>
+    </div>
   );
 };
 
-export default function ApplicationsSection() {
-  const openApplications = applicationsData.filter(app => app.status === 'open');
-  const closedApplications = applicationsData.filter(app => app.status === 'closed');
+export default function ReviewableApplications() {
+  const [forms, setForms] = React.useState<ApplicationFormData[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const loadForms = async () => {
+      try {
+        const formsData = await fetchForms();
+        setForms(formsData);
+        setError(null);
+      } catch (error) {
+        setError('Failed to load application forms. Please try again later.');
+        console.error('Error loading forms:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadForms();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-gray-600">Loading application forms...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-red-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 text-blue-600 hover:text-blue-800"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    // Section background matches the image (very light lavender/gray)
-    <section className="py-16 sm:py-24 bg-[#F3F4F9]"> {/* Explicit light purple background */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Application Forms</h1>
+          <p className="text-gray-600">Review and manage application submissions</p>
+        </div>
 
-        {/* Open Applications */}
-        {openApplications.length > 0 && (
-          <div className="mb-12 sm:mb-16">
-            <div className="text-center mb-8 sm:mb-10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
-                Open Applications
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {openApplications.map((app) => (
-                <ApplicationCard key={app.id} {...app} />
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {forms.map((form) => (
+            <ReviewableApplicationCard key={form.id} {...form} />
+          ))}
+        </div>
 
-        {/* Closed Applications */}
-        {closedApplications.length > 0 && (
-          <div>
-            <div className="text-center mb-8 sm:mb-10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
-                Closed Applications
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {closedApplications.map((app) => (
-                <ApplicationCard key={app.id} {...app} />
-              ))}
-            </div>
+        {forms.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No application forms found.</p>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertForm, selectFeed } from "../../../repositories/forms/FormRepository";
+import { insertForm, selectFeed, updateFormById } from "../../../repositories/forms/FormRepository";
 
 // GET /forms
 export const getFeed = async (req: Request, res: Response) => {
@@ -22,5 +22,18 @@ export const createForm = async (req: Request, res: Response) => {
     res.status(201).json({ message: "Form created", insertedForm });
   } catch (error) {
     res.status(500).json({ message: "Failed to create Form", error: (error as Error).message });
+  }
+};
+
+// PUT /forms/:id
+export const updateForm = async (req: Request, res: Response) => {
+  const formId = parseInt(req.params.id);
+  const formData = req.body;
+
+  try {
+    const updatedForm = await updateFormById(formId, formData);
+    res.json({ message: "Form updated successfully", form: updatedForm });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating form", error: (error as Error).message });
   }
 };

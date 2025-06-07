@@ -3,48 +3,65 @@
 
 import React from 'react';
 import { notFound } from 'next/navigation';
-import ApplicationReviewClientPage, { type Applicant } from '@/components/applications/ApplicationReviewPage';
-import { allApplicationTypesForReview } from '@/lib/data/applicant/applicantIDData';
+import ApplicationReviewClientPage from '@/components/applications/ApplicationReviewPage';
+import { Applicant } from '@/models/types/application';
 
-// Extracts the simplified Applicant[] list for the client component
-function getApplicationReviewData(applicationId: string): {
+// Mock function to get application review data from form ID
+// In a real app, this would fetch from your API
+async function getApplicationReviewData(applicationId: string): Promise<{
   applicationName: string;
   applicationTerm: string;
   submittedApplicants: Applicant[];
-} | undefined {
-  const application = allApplicationTypesForReview.find(app => app.id === applicationId);
+} | null> {
+  try {
+    // Fetch the specific form data
+    const response = await fetch(`http://localhost:3000/api/forms/feed`);
+    const data = await response.json();
+    const form = data.feed.find((f: any) => f.id.toString() === applicationId);
+    
+    if (!form) return null;
 
-  if (!application) return undefined;
-
-  const submittedApplicants: Applicant[] = application.submissions.map(sub => {
-    let scoreValue: number | undefined = undefined;
-
-    if (sub.currentScore) {
-      const match = sub.currentScore.match(/(\d+(\.\d+)?)/);
-      if (match) scoreValue = parseFloat(match[1]);
-    }
+    // Mock applicant data - in real app, you'd fetch actual submissions
+    const mockApplicants: Applicant[] = [
+      {
+        id: "1",
+        name: "John Doe",
+        appliedDate: "2025-05-15",
+        score: 8.5,
+        applicationLink: `/applications-review/${applicationId}/1`
+      },
+      {
+        id: "2", 
+        name: "Jane Smith",
+        appliedDate: "2025-05-16",
+        score: 9.2,
+        applicationLink: `/applications-review/${applicationId}/2`
+      }
+    ];
 
     return {
-      id: sub.id,
-      name: `${sub.firstName} ${sub.lastName}`,
-      appliedDate: sub.appliedDate ?? 'N/A',
-      score: scoreValue,
-      applicationLink: `/applications-review/${applicationId}/${sub.id}`,
+      applicationName: form.title,
+      applicationTerm: "Fall 2025", // Could be derived from form data
+      submittedApplicants: mockApplicants,
     };
-  });
-
-  return {
-    applicationName: application.name,
-    applicationTerm: application.term,
-    submittedApplicants,
-  };
+  } catch (error) {
+    console.error('Error fetching application data:', error);
+    return null;
+  }
 }
 
 // Generate static paths for each application ID
 export async function generateStaticParams() {
-  return allApplicationTypesForReview.map(app => ({
-    applicationId: app.id,
-  }));
+  try {
+    const response = await fetch('http://localhost:3000/api/forms/feed');
+    const data = await response.json();
+    return data.feed.map((form: any) => ({
+      applicationId: form.id.toString(),
+    }));
+  } catch (error) {
+    // Return empty array if API is not available
+    return [];
+  }
 }
 
 interface PageProps {
@@ -54,9 +71,9 @@ interface PageProps {
 }
 
 // Server Component Page
-export default function Page({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { applicationId } = params;
-  const reviewData = getApplicationReviewData(applicationId);
+  const reviewData = await getApplicationReviewData(applicationId);
 
   if (!reviewData) {
     notFound();
@@ -64,6 +81,7 @@ export default function Page({ params }: PageProps) {
 
   return (
     <ApplicationReviewClientPage
+      applicationId={applicationId}
       applicationName={reviewData.applicationName}
       applicationTerm={reviewData.applicationTerm}
       submittedApplicants={reviewData.submittedApplicants}

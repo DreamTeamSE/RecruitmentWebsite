@@ -1,24 +1,17 @@
+// join-dte/[applicationId]/page.tsx
 "use client";
 
 import React from 'react';
-import ApplicationDetailPageContent, { ApplicationData } from '@/components/involved/join-dte/ApplicationTemplate'; // Adjust path if needed
-import { applicationsData } from '@/lib/data/application/application';
-import { notFound } from 'next/navigation';
+import ApplicationTemplate from '@/components/involved/join-dte/ApplicationTemplate';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     applicationId: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
-  const { applicationId } = params;
+export default async function Page({ params }: PageProps) {
+  const { applicationId } = await params;
 
-  const application: ApplicationData | undefined = applicationsData.find(app => app.id === applicationId);
-
-  if (!application) {
-    notFound();
-  }
-
-  return <ApplicationDetailPageContent application={application} />;
+  return <ApplicationTemplate applicationId={applicationId} />;
 }

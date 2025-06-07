@@ -13,12 +13,7 @@ export interface Applicant {
   applicationLink?: string; // Link to the full application details of this applicant
 }
 
-// Props for the client component
-export interface ApplicationReviewClientPageProps {
-  applicationName: string;
-  applicationTerm: string;
-  submittedApplicants: Applicant[];
-}
+
 
 
 // Defines the structure for a single applicant's submission
@@ -75,7 +70,7 @@ export interface Application {
   deadline?: string; // For open applications
   closedDate?: string; // For closed applications
   status: 'open' | 'closed';
-  href: string; // Link to the application page or form
+  href?: string; // Link to the application page or form (optional, will be constructed from id)
 }
 
 
