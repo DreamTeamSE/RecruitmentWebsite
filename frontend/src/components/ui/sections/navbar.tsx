@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Button } from "@/components/ui/button"; // Assuming this uses the buttonVariants from the Canvas
 import { Menu, X, ChevronDown, LogOut, LogIn, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
+import UserMenu from '@/components/auth/UserMenu';
 
 interface NavSubLinkItem {
   href: string;
@@ -57,8 +59,16 @@ const baseNavLinks: NavLinkItem[] = [
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isUserSignedIn, setIsUserSignedIn] = useState(false); // Added state for sign-in status
+  const { data: session, status } = useSession();
   const pathname = usePathname();
+
+  // Filter nav links based on authentication status
+  const navLinks = baseNavLinks.filter(link => {
+    if (link.requiresAuth) {
+      return status === "authenticated" && session?.user?.emailVerified;
+    }
+    return true;
+  });
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -86,20 +96,6 @@ export default function Navbar() {
     closeMobileMenu();
   };
 
-  const handleSignOut = () => {
-    setIsUserSignedIn(false);
-    closeMobileMenu();
-    console.log("User signed out");
-  };
-
-  // This function is for demo purposes to toggle sign-in state easily.
-  // In a real app, sign-in would be handled by an auth flow, likely on a /login page.
-  const simulateSignIn = () => {
-    setIsUserSignedIn(true);
-    closeMobileMenu();
-    console.log("User signed in (simulated)");
-  }
-
   useEffect(() => {
     // Close mobile menu if pathname changes
     // This was causing an infinite loop with closeMobileMenu also setting state
@@ -122,9 +118,7 @@ export default function Navbar() {
   }, [isMobileMenuOpen]); // Only re-run if isMobileMenuOpen changes
   
   // Filter navLinks based on authentication status
-  const navLinksToDisplay = baseNavLinks.filter(link => {
-    return link.requiresAuth ? isUserSignedIn : true;
-  });
+  const navLinksToDisplay = navLinks;
 
   return (
     <>
@@ -188,17 +182,7 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {isUserSignedIn ? (
-              <Button onClick={handleSignOut} variant="default" size="default" className="whitespace-nowrap rounded-full px-5">
-                <LogOut size={16} className="mr-2" /> Sign Out
-              </Button>
-            ) : (
-              <Link href="/login" className="hidden md:block" onClick={closeMobileMenu}>
-                <Button variant="default" size="default" className="whitespace-nowrap rounded-full px-5">
-                  <LogIn size={16} className="mr-2" /> Staff Login
-                </Button>
-              </Link>
-            )}
+            <UserMenu />
             <div className="md:hidden">
               <Button
                 variant="ghost"
@@ -268,33 +252,14 @@ export default function Navbar() {
                         )}
                       </div>
                     ))}
-                    {/* Login/Logout button for mobile */}
-                    <div className="p-3 mt-2">
-                        {isUserSignedIn ? (
-                            <Button onClick={handleSignOut} variant="default" className="w-full rounded-full flex items-center justify-center py-2.5">
-                               <LogOut size={16} className="mr-2" /> Sign Out
-                            </Button>
-                        ) : (
-                            <Link href="/login" className="block w-full" onClick={closeMobileMenu}>
-                                <Button variant="default" className="w-full rounded-full flex items-center justify-center py-2.5">
-                                    <LogIn size={16} className="mr-2" /> Staff Login
-                                </Button>
-                            </Link>
-                        )}
+                    {/* User menu for mobile */}
+                    <div className="p-3 mt-2 border-t border-gray-200">
+                        <UserMenu />
                     </div>
                 </nav>
             </div>
         </div>
       )}
-       {/* Demo button to toggle sign-in state (for testing) - Keep it commented out for production */}
-       <div className="fixed bottom-4 right-4 z-50">
-            <Button onClick={simulateSignIn} variant="outline" size="sm">
-                Sign In (Demo)
-            </Button>
-            <Button onClick={handleSignOut} variant="outline" size="sm" className="ml-2">
-                Sign Out (Demo)
-            </Button>
-       </div>
     </>
   );
 }

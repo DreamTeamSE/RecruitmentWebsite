@@ -2,7 +2,12 @@
 
 import React from 'react';
 import CreateApplicationForm from '@/components/applications/CreateApplicationForm';
+import AuthGuard from "@/components/auth/AuthGuard";
 
 export default function CreateApplicationPage() {
-  return <CreateApplicationForm />;
+  return (
+    <AuthGuard>
+      <CreateApplicationForm />
+    </AuthGuard>
+  );
 }

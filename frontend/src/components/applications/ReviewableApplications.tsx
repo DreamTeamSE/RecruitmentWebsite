@@ -229,9 +229,31 @@ export default function ReviewableApplications() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Application Forms</h1>
-          <p className="text-gray-600">Review and manage application submissions</p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Application Forms</h1>
+            <p className="text-gray-600">Review and manage application submissions</p>
+          </div>
+          <Link 
+            href="/applications-review/create"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className="mr-2"
+            >
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Create New Form
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -248,7 +270,40 @@ export default function ReviewableApplications() {
 
         {forms.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600">No application forms found.</p>
+            <div className="max-w-md mx-auto">
+              <div className="mb-4">
+                <svg 
+                  className="mx-auto h-12 w-12 text-gray-400" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No application forms found</h3>
+              <p className="text-gray-600 mb-6">Get started by creating your first application form.</p>
+              <Link 
+                href="/applications-review/create"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className="mr-2"
+                >
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Create Your First Form
+              </Link>
+            </div>
           </div>
         )}
       </div>

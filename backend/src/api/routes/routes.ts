@@ -5,6 +5,7 @@ import recruiterRouter from './users/recruiterRoutes'
 import applicantRouter from './users/applicantRoutes'
 import formResponseRoutes from './forms/formResponseRoutes'
 import interviewRoutes from './interviews/interviewRoutes'
+// import authRoutes from './auth/authRoutes'
 
 
 const router = Router();
@@ -18,6 +19,7 @@ router.use('/applicant', applicantRouter);
 
 router.use('/interview', interviewRoutes);
 
+// router.use('/auth', authRoutes);
 
 
 export default router;

@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { createRecruiter } from '../../controllers/users/RecruiterController'
+import { createRecruiter, getRecruiters } from '../../controllers/users/RecruiterController'
 const router = Router();
 
 
+
+router.get("/", getRecruiters);
 
 router.post("/create", createRecruiter)
 

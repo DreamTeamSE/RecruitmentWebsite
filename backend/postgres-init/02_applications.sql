@@ -1,6 +1,6 @@
 CREATE TABLE Forms (
   id SERIAL PRIMARY KEY,
-  recruiter_id TEXT NOT NULL REFERENCES Recruiters(uuid),
+  recruiter_id UUID NOT NULL REFERENCES staff(id),
   title TEXT NOT NULL,
   description TEXT,
   created_at TIMESTAMP DEFAULT now()

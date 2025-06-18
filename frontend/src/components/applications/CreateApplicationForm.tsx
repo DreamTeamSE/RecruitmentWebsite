@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ApplicationQuestion } from '@/models/types/application';
+import { Recruiter, RecruiterResponse } from '@/models/types/recruiter';
+import { BACKEND_URL } from '@/lib/constants/string';
 
 const ArrowLeft = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
@@ -12,23 +14,22 @@ const ArrowLeft = () => (
 );
 
 interface CreateApplicationFormData {
-  name: string;
-  term: string;
+  title: string;
   description: string;
-  deadline: string;
-  status: 'open' | 'closed';
+  recruiter_id: string;
   questions: ApplicationQuestion[];
 }
 
 const CreateApplicationForm: React.FC = () => {
   const [formData, setFormData] = useState<CreateApplicationFormData>({
-    name: '',
-    term: '',
+    title: '',
     description: '',
-    deadline: '',
-    status: 'open',
+    recruiter_id: '',
     questions: []
   });
+
+  const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
+  const [loadingRecruiters, setLoadingRecruiters] = useState(true);
 
   const [newQuestion, setNewQuestion] = useState<Partial<ApplicationQuestion>>({
     questionText: '',
@@ -36,6 +37,30 @@ const CreateApplicationForm: React.FC = () => {
     placeholder: '',
     required: true
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+
+  // Fetch recruiters on component mount
+  useEffect(() => {
+    const fetchRecruiters = async () => {
+      try {
+        const response = await fetch(`http://${BACKEND_URL}/api/recruiter`);
+        if (response.ok) {
+          const data: RecruiterResponse = await response.json();
+          setRecruiters(data.recruiters);
+        } else {
+          console.error('Failed to fetch recruiters');
+        }
+      } catch (error) {
+        console.error('Error fetching recruiters:', error);
+      } finally {
+        setLoadingRecruiters(false);
+      }
+    };
+
+    fetchRecruiters();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -53,7 +78,7 @@ const CreateApplicationForm: React.FC = () => {
   const addQuestion = () => {
     if (newQuestion.questionText?.trim()) {
       const question: ApplicationQuestion = {
-        id: `q${formData.questions.length + 1}`,
+        id: `temp-${Date.now()}`, // Temporary ID for frontend use
         questionText: newQuestion.questionText,
         type: newQuestion.type || 'text',
         placeholder: newQuestion.placeholder || '',
@@ -92,30 +117,89 @@ const CreateApplicationForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Generate a unique ID for the application
-    const applicationId = `${formData.name.toLowerCase().replace(/\s+/g, '-')}-${formData.term.toLowerCase().replace(/\s+/g, '-')}`;
+    // More detailed validation
+    const missingFields: string[] = [];
+    if (!formData.title.trim()) missingFields.push('Application Title');
+    if (!formData.description.trim()) missingFields.push('Description');
+    if (!formData.recruiter_id.trim()) missingFields.push('Recruiter Selection');
     
-    const newApplication = {
-      ...formData,
-      id: applicationId
-    };
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following required fields:\n• ${missingFields.join('\n• ')}`);
+      return;
+    }
 
-    // In a real application, you would send this to your backend
-    console.log('New Application Created:', newApplication);
-    alert('Application created successfully! (Check console for data)');
+    setIsSubmitting(true);
     
-    // Reset form
-    setFormData({
-      name: '',
-      term: '',
-      description: '',
-      deadline: '',
-      status: 'open',
-      questions: []
-    });
+    try {
+      // Create the form first
+      const createFormResponse = await fetch(`http://${BACKEND_URL}/api/forms/application`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recruiter_id: formData.recruiter_id,
+          title: formData.title,
+          description: formData.description,
+        }),
+      });
+
+      if (!createFormResponse.ok) {
+        const errorText = await createFormResponse.text();
+        throw new Error(`Failed to create form: ${errorText}`);
+      }
+
+      const createFormResult = await createFormResponse.json();
+      const newFormId = createFormResult.insertedForm.id;
+      
+      console.log('Form created successfully:', createFormResult);
+
+      // Create questions for the form
+      if (formData.questions.length > 0) {
+        console.log(`Creating ${formData.questions.length} questions...`);
+        
+        for (let i = 0; i < formData.questions.length; i++) {
+          const question = formData.questions[i];
+          
+          const createQuestionResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              form_id: newFormId,
+              question_text: question.questionText,
+              question_type: question.type,
+              question_order: i + 1
+            }),
+          });
+
+          if (!createQuestionResponse.ok) {
+            console.error(`Failed to create question ${i + 1}:`, await createQuestionResponse.text());
+            // Continue with other questions rather than failing completely
+          } else {
+            console.log(`Question ${i + 1} created successfully`);
+          }
+        }
+      }
+
+      console.log('Application form created successfully with ID:', newFormId);
+      
+      // Show success message and redirect
+      alert(`Application form "${formData.title}" created successfully!`);
+      
+      // Redirect to the form review page
+      window.location.href = `/applications-review/${newFormId}`;
+      
+    } catch (error) {
+      console.error('Error creating form:', error);
+      alert(`Failed to create form: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -140,34 +224,18 @@ const CreateApplicationForm: React.FC = () => {
             <div className="space-y-6 mb-8">
               <h2 className="text-2xl font-bold text-gray-900">Basic Information</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-lg font-semibold text-gray-800 mb-2">
-                    Application Name *
+                  <label htmlFor="title" className="block text-lg font-semibold text-gray-800 mb-2">
+                    Application Title *
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
+                    id="title"
+                    name="title"
+                    value={formData.title}
                     onChange={handleInputChange}
-                    placeholder="e.g., Software, Design, Research"
-                    required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="term" className="block text-lg font-semibold text-gray-800 mb-2">
-                    Term *
-                  </label>
-                  <input
-                    type="text"
-                    id="term"
-                    name="term"
-                    value={formData.term}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Fall 2025, Spring 2026"
+                    placeholder="e.g., Software Engineering Application, Design Team Application"
                     required
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -190,37 +258,35 @@ const CreateApplicationForm: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="deadline" className="block text-lg font-semibold text-gray-800 mb-2">
-                    Application Deadline *
-                  </label>
-                  <input
-                    type="date"
-                    id="deadline"
-                    name="deadline"
-                    value={formData.deadline}
+              <div>
+                <label htmlFor="recruiter_id" className="block text-lg font-semibold text-gray-800 mb-2">
+                  Recruiter *
+                </label>
+                {loadingRecruiters ? (
+                  <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                    Loading recruiters...
+                  </div>
+                ) : (
+                  <select
+                    id="recruiter_id"
+                    name="recruiter_id"
+                    value={formData.recruiter_id}
                     onChange={handleInputChange}
                     required
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="status" className="block text-lg font-semibold text-gray-800 mb-2">
-                    Status *
-                  </label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="open">Open</option>
-                    <option value="closed">Closed</option>
+                    <option value="">Select a recruiter...</option>
+                    {recruiters.map((recruiter) => (
+                      <option key={recruiter.id} value={recruiter.id}>
+                        {recruiter.first_name} {recruiter.last_name}
+                      </option>
+                    ))}
                   </select>
-                </div>
+                )}
+                <p className="mt-1 text-sm text-gray-600">
+                  Select the recruiter who will manage this application form.
+                </p>
               </div>
             </div>
 
@@ -367,9 +433,10 @@ const CreateApplicationForm: React.FC = () => {
             <div className="text-center pt-6 border-t border-gray-200">
               <button 
                 type="submit" 
-                className="bg-green-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-green-700 transition-transform duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                disabled={isSubmitting}
+                className="bg-green-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-transform duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
-                Create Application
+                {isSubmitting ? 'Creating Application...' : 'Create Application'}
               </button>
             </div>
           </form>
