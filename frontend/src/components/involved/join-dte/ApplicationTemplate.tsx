@@ -69,6 +69,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentForm, setCurrentForm] = useState<ApplicationFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [apiQuestions, setApiQuestions] = useState<ApplicationQuestion[]>([]);
 
   // Load form data and find the specific form
   React.useEffect(() => {
@@ -77,6 +78,24 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
         const forms = await fetchForms();
         const form = forms.find(f => f.id.toString() === applicationId);
         setCurrentForm(form || null);
+        
+        // If we found a form, also fetch its questions
+        if (form) {
+          const questionsResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question?form_id=${form.id}`);
+          if (questionsResponse.ok) {
+            const questionsResult = await questionsResponse.json();
+            const fetchedQuestions = (questionsResult.question || []).map((q: any) => ({
+              id: q.id.toString(), // Use actual database ID
+              questionText: q.question_text,
+              type: q.question_type === 'text' ? 'text' : 'textarea',
+              required: true,
+              placeholder: `Enter your answer for question ${q.question_order}...`,
+              order: q.question_order,
+              dbId: q.id // Store database ID
+            }));
+            setApiQuestions(fetchedQuestions);
+          }
+        }
       } catch (error) {
         console.error('Error loading form data:', error);
       } finally {
@@ -101,6 +120,13 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
         questionState[q.id] = '';
       });
       setFormData(prev => ({ ...prev, ...questionState }));
+    } else if (apiQuestions.length > 0) {
+      // Initialize form data with API questions
+      const questionState: { [key: string]: string } = {};
+      apiQuestions.forEach((q) => {
+        questionState[q.id] = '';
+      });
+      setFormData(prev => ({ ...prev, ...questionState }));
     } else if (currentForm) {
       // Default questions for forms without predefined questions
       const defaultQuestions = {
@@ -110,7 +136,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       };
       setFormData(prev => ({ ...prev, ...defaultQuestions }));
     }
-  }, [application, currentForm]);
+  }, [application, currentForm, apiQuestions]);
 
   // Default questions when no application data is available
   const defaultQuestions: ApplicationQuestion[] = [
@@ -205,7 +231,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       }
 
       // Step 4: Submit answers for each question
-      const questionsToProcess = application?.questions || defaultQuestions;
+      const questionsToProcess = apiQuestions.length > 0 ? apiQuestions : (application?.questions || defaultQuestions);
       
       if (questionsToProcess) {
         for (let i = 0; i < questionsToProcess.length; i++) {
@@ -305,7 +331,12 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
   }
 
   // Use form data if available, otherwise fall back to application data
-  const displayData = currentForm || {
+  const displayData = currentForm ? {
+    name: currentForm.title,
+    description: currentForm.description,
+    deadline: 'See form details',
+    term: ''
+  } : {
     name: application?.name || 'Application Form',
     description: application?.description || 'Please fill out this application form.',
     deadline: application?.deadline || 'See form details',
@@ -382,7 +413,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
             {/* Application Questions Section */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Application Questions</h2>
-              {(application?.questions || defaultQuestions).map(q => (
+              {(apiQuestions.length > 0 ? apiQuestions : (application?.questions || defaultQuestions)).map(q => (
                 <FormQuestion
                   key={q.id}
                   question={q}

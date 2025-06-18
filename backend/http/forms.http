@@ -1,0 +1,49 @@
+### Forms API Endpoints
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Get all forms (Feed)
+GET {{baseUrl}}/api/forms/feed
+
+### 2. Create a new form
+POST {{baseUrl}}/api/forms/application
+Content-Type: {{contentType}}
+
+{
+  "recruiter_id": "test-recruiter-123",
+  "title": "Software Engineering Assessment",
+  "description": "This form is used to evaluate software engineering candidates."
+}
+
+### 3. Get form by ID (replace 1 with actual form ID)
+GET {{baseUrl}}/api/forms/1
+
+### 4. Update form by ID (replace 1 with actual form ID)
+PUT {{baseUrl}}/api/forms/1
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Software Engineering Assessment",
+  "description": "This form has been updated for better candidate evaluation."
+}
+
+### 5. Delete form by ID (replace 1 with actual form ID)
+DELETE {{baseUrl}}/api/forms/1
+
+### 6. Create a question for a form (replace 1 with actual form ID)
+POST {{baseUrl}}/api/forms/1/questions
+Content-Type: {{contentType}}
+
+{
+  "text": "What is your experience with TypeScript?",
+  "type": "text",
+  "required": true,
+  "options": null
+}
+
+### 7. Delete question from form (replace 1 with form ID and 1 with question ID)
+DELETE {{baseUrl}}/api/forms/1/questions/1
+
+### 8. Delete question by question ID only (replace 1 with question ID)
+DELETE {{baseUrl}}/api/forms/questions/1

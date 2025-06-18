@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ApplicationQuestion } from '@/models/types/application';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
 import { BACKEND_URL } from '@/lib/constants/string';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 const ArrowLeft = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
@@ -48,6 +49,10 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [addingQuestion, setAddingQuestion] = useState(false);
+  const [removingQuestion, setRemovingQuestion] = useState<string | null>(null);
+  const [deletingForm, setDeletingForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuestion, setNewQuestion] = useState<Partial<ApplicationQuestion>>({
     questionText: '',
     type: 'text',
@@ -70,11 +75,13 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
           if (questionsResponse.ok) {
             const questionsResult = await questionsResponse.json();
             existingQuestions = (questionsResult.question || []).map((q: any) => ({
-              id: `question-${q.question_order}`,
+              id: q.id.toString(), // Use the actual database ID
               questionText: q.question_text,
               type: q.question_type === 'text' ? 'text' : 'textarea',
               required: true,
-              placeholder: `Enter your answer for question ${q.question_order}...`
+              placeholder: `Enter your answer for question ${q.question_order}...`,
+              order: q.question_order,
+              dbId: q.id // Store the database ID separately for deletion
             }));
           }
 
@@ -113,14 +120,42 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
     }));
   };
 
-  const addQuestion = () => {
-    if (newQuestion.questionText?.trim() && formData) {
+  const addQuestion = async () => {
+    if (!newQuestion.questionText?.trim() || !formData) return;
+    
+    setAddingQuestion(true);
+    try {
+      // Create the question via API using the same endpoint as ApplicationTemplate
+      const createQuestionResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          form_id: formData.id,
+          question_text: newQuestion.questionText,
+          question_type: newQuestion.type || 'text',
+          question_order: formData.questions.length + 1
+        }),
+      });
+
+      if (!createQuestionResponse.ok) {
+        const errorText = await createQuestionResponse.text();
+        throw new Error(`Failed to create question: ${errorText}`);
+      }
+
+      const createQuestionResult = await createQuestionResponse.json();
+      console.log('Question created:', createQuestionResult);
+
+      // Add the new question to local state with the returned data
       const question: ApplicationQuestion = {
-        id: `question-${formData.questions.length + 1}`,
+        id: createQuestionResult.question.id.toString(), // Use actual database ID
         questionText: newQuestion.questionText,
         type: newQuestion.type || 'text',
         placeholder: newQuestion.placeholder || '',
-        required: newQuestion.required ?? true
+        required: newQuestion.required ?? true,
+        order: createQuestionResult.question.question_order,
+        dbId: createQuestionResult.question.id // Store database ID
       };
       
       setFormData(prev => prev ? ({
@@ -135,19 +170,55 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
         placeholder: '',
         required: true
       });
+
+      alert('Question added successfully!');
+      
+    } catch (err) {
+      console.error('Error creating question:', err);
+      alert('Failed to add question. Please try again.');
+    } finally {
+      setAddingQuestion(false);
     }
   };
 
-  const removeQuestion = (questionId: string) => {
-    setFormData(prev => prev ? ({
-      ...prev,
-      questions: prev.questions.filter(q => q.id !== questionId)
-    }) : null);
-  };
-
-  const handleSave = async () => {
+  const removeQuestion = async (questionId: string) => {
     if (!formData) return;
     
+    // Find the question to get the database ID
+    const question = formData.questions.find(q => q.id === questionId);
+    if (!question || !question.dbId) return;
+    
+    setRemovingQuestion(questionId);
+    try {
+      // Delete the question via API using the database ID
+      const deleteQuestionResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question/${question.dbId}`, {
+        method: 'DELETE',
+      });
+
+      if (!deleteQuestionResponse.ok) {
+        const errorText = await deleteQuestionResponse.text();
+        throw new Error(`Failed to delete question: ${errorText}`);
+      }
+
+      console.log('Question deleted successfully');
+
+      // Remove from local state
+      setFormData(prev => prev ? ({
+        ...prev,
+        questions: prev.questions.filter(q => q.id !== questionId)
+      }) : null);
+
+      alert('Question removed successfully!');
+      
+    } catch (err) {
+      console.error('Error deleting question:', err);
+      alert('Failed to remove question. Please try again.');
+    } finally {
+      setRemovingQuestion(null);
+    }
+  };  const handleSave = async () => {
+    if (!formData) return;
+
     setSaving(true);
     try {
       // Update form basic info
@@ -177,6 +248,38 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleDeleteForm = async () => {
+    if (!formData) return;
+
+    setDeletingForm(true);
+    try {
+      const deleteResponse = await fetch(`http://${BACKEND_URL}/api/forms/${formData.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!deleteResponse.ok) {
+        const errorText = await deleteResponse.text();
+        throw new Error(`Failed to delete form: ${errorText}`);
+      }
+
+      console.log('Form deleted successfully');
+      
+      // Redirect to applications review page
+      window.location.href = '/applications-review';
+      
+    } catch (err) {
+      console.error('Error deleting form:', err);
+      alert('Failed to delete form. Please try again.');
+    } finally {
+      setDeletingForm(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
   };
 
   if (loading) {
@@ -223,14 +326,25 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
             Back to Application Review
           </Link>
           
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
-          >
-            <Save />
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={openDeleteModal}
+              disabled={deletingForm}
+              className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <Trash />
+              Delete Form
+            </button>
+            
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <Save />
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
         
         <div className="bg-white p-8 sm:p-12 rounded-xl shadow-lg border border-gray-200">
@@ -300,10 +414,15 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
                     </div>
                     <button
                       onClick={() => removeQuestion(question.id)}
-                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                      disabled={removingQuestion === question.id}
+                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Remove question"
                     >
-                      <Trash />
+                      {removingQuestion === question.id ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+                      ) : (
+                        <Trash />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -383,10 +502,10 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
                 
                 <button
                   onClick={addQuestion}
-                  disabled={!newQuestion.questionText?.trim()}
+                  disabled={!newQuestion.questionText?.trim() || addingQuestion}
                   className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
-                  Add Question
+                  {addingQuestion ? 'Adding Question...' : 'Add Question'}
                 </button>
               </div>
             </div>
@@ -405,6 +524,19 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteForm}
+        title="Delete Application Form"
+        message={`Are you sure you want to delete "${formData?.title}"? This action cannot be undone and will remove all associated questions and submissions.`}
+        confirmText="Delete Form"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deletingForm}
+      />
     </div>
   );
 };

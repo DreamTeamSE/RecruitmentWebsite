@@ -1,0 +1,23 @@
+### Health Check and General API Endpoints
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Health Check (if implemented)
+GET {{baseUrl}}/health
+
+### 2. API Root Check
+GET {{baseUrl}}/api
+
+### 3. Test CORS
+OPTIONS {{baseUrl}}/api/forms/feed
+Origin: http://localhost:3001
+
+### 4. Test Error Handling - Non-existent endpoint
+GET {{baseUrl}}/api/nonexistent
+
+### 5. Test Error Handling - Invalid form ID
+GET {{baseUrl}}/api/forms/99999
+
+### 6. Test Error Handling - Invalid question ID
+DELETE {{baseUrl}}/api/forms/questions/99999

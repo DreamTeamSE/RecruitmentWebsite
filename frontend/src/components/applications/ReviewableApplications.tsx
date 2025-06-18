@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
+import { BACKEND_URL } from '@/lib/constants/string';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 // Edit icon component
 const EditIcon = () => (
@@ -23,24 +25,80 @@ const EditIcon = () => (
   </svg>
 );
 
-const ReviewableApplicationCard: React.FC<ApplicationFormData> = ({ id, title, description, created_at }) => {
+// Trash icon component
+const TrashIcon = () => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="16" 
+    height="16" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className="h-4 w-4"
+  >
+    <polyline points="3,6 5,6 21,6"/>
+    <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+    <line x1="10" y1="11" x2="10" y2="17"/>
+    <line x1="14" y1="11" x2="14" y2="17"/>
+  </svg>
+);
+
+interface ReviewableApplicationCardProps extends ApplicationFormData {
+  onDelete: (formId: number) => void;
+  isDeleting: boolean;
+  onShowDeleteModal: (formId: number, title: string) => void;
+}
+
+const ReviewableApplicationCard: React.FC<ReviewableApplicationCardProps> = ({ 
+  id, 
+  title, 
+  description, 
+  created_at, 
+  onDelete, 
+  isDeleting,
+  onShowDeleteModal
+}) => {
   const formattedDate = new Date(created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onShowDeleteModal(id, title);
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative group">
-      {/* Edit button - positioned absolutely in top right */}
-      <Link 
-        href={`/applications-review/${id}/edit`} 
-        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100"
-        onClick={(e) => e.stopPropagation()}
-        title="Edit application form"
-      >
-        <EditIcon />
-      </Link>
+      {/* Action buttons - positioned absolutely in top right */}
+      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <Link 
+          href={`/applications-review/${id}/edit`} 
+          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+          onClick={(e) => e.stopPropagation()}
+          title="Edit application form"
+        >
+          <EditIcon />
+        </Link>
+        
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Delete application form"
+        >
+          {isDeleting ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+          ) : (
+            <TrashIcon />
+          )}
+        </button>
+      </div>
 
       {/* Main content - wrapped in Link for navigation */}
       <Link href={`/applications-review/${id}`} className="block">
@@ -63,6 +121,16 @@ export default function ReviewableApplications() {
   const [forms, setForms] = React.useState<ApplicationFormData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [deletingFormId, setDeletingFormId] = React.useState<number | null>(null);
+  const [deleteModal, setDeleteModal] = React.useState<{
+    isOpen: boolean;
+    formId: number | null;
+    formTitle: string;
+  }>({
+    isOpen: false,
+    formId: null,
+    formTitle: ''
+  });
 
   React.useEffect(() => {
     const loadForms = async () => {
@@ -80,6 +148,53 @@ export default function ReviewableApplications() {
 
     loadForms();
   }, []);
+
+  const showDeleteModal = (formId: number, title: string) => {
+    setDeleteModal({
+      isOpen: true,
+      formId,
+      formTitle: title
+    });
+  };
+
+  const hideDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      formId: null,
+      formTitle: ''
+    });
+  };
+
+  const handleDeleteForm = async (formId: number) => {
+    setDeletingFormId(formId);
+    try {
+      const response = await fetch(`http://${BACKEND_URL}/api/forms/${formId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete form: ${errorText}`);
+      }
+
+      // Remove the form from the local state
+      setForms(prevForms => prevForms.filter(form => form.id !== formId));
+      
+      console.log('Form deleted successfully');
+    } catch (err) {
+      console.error('Error deleting form:', err);
+      alert('Failed to delete form. Please try again.');
+    } finally {
+      setDeletingFormId(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteModal.formId) {
+      await handleDeleteForm(deleteModal.formId);
+      hideDeleteModal();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -121,7 +236,13 @@ export default function ReviewableApplications() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {forms.map((form) => (
-            <ReviewableApplicationCard key={form.id} {...form} />
+            <ReviewableApplicationCard 
+              key={form.id} 
+              {...form} 
+              onDelete={handleDeleteForm}
+              isDeleting={deletingFormId === form.id}
+              onShowDeleteModal={showDeleteModal}
+            />
           ))}
         </div>
 
@@ -131,6 +252,19 @@ export default function ReviewableApplications() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={hideDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="Delete Application Form"
+        message={`Are you sure you want to delete "${deleteModal.formTitle}"? This action cannot be undone and will remove all associated questions and submissions.`}
+        confirmText="Delete Form"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deletingFormId === deleteModal.formId}
+      />
     </div>
   );
 }

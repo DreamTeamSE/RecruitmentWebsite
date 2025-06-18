@@ -80,6 +80,8 @@ export interface ApplicationQuestion {
   type: 'text' | 'textarea';
   placeholder?: string;
   required?: boolean;
+  order?: number; // Add this field to store the question order for API operations
+  dbId?: number; // Add this field to store the database ID for deletions
 }
 
 export interface ApplicationData {
