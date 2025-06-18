@@ -12,7 +12,7 @@ POST {{baseUrl}}/api/forms/application
 Content-Type: {{contentType}}
 
 {
-  "recruiter_id": "test-uuid-123",
+  "staff_id": "test-uuid-123",
   "title": "Quick Test Form", 
   "description": "Testing API endpoints"
 }

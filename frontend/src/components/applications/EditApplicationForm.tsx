@@ -35,7 +35,7 @@ interface EditApplicationFormData {
   id: number;
   title: string;
   description: string;
-  recruiter_id: string;
+  staff_id: string;
   created_at: string;
   questions: ApplicationQuestion[];
 }
@@ -89,7 +89,7 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
             id: form.id,
             title: form.title,
             description: form.description,
-            recruiter_id: form.recruiter_id,
+            staff_id: form.staff_id,
             created_at: form.created_at,
             questions: existingQuestions
           });

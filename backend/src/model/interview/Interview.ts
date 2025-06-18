@@ -1,5 +1,6 @@
 export interface Interview {
     id: number;
-    form_entry_id: number;
-    created_by: number;
+    form_id: number;
+    created_by: string; // UUID string referencing staff(id)
+    created_at: string;
 }

@@ -163,6 +163,14 @@ const insertStaff = async (
 ): Promise<Staff> => {
     const client = await psql_client.connect();
     try {
+        // Validate and sanitize input data
+        if (!staffData.first_name || typeof staffData.first_name !== 'string') {
+            throw new Error('first_name is required and must be a string');
+        }
+        if (!staffData.last_name || typeof staffData.last_name !== 'string') {
+            throw new Error('last_name is required and must be a string');
+        }
+        
         // For basic staff creation without authentication
         const id = staffData.uuid || uuidv4();
         const email = staffData.email || `${staffData.first_name.toLowerCase()}.${staffData.last_name.toLowerCase()}@dreamteameng.org`;

@@ -11,7 +11,7 @@ POST {{baseUrl}}/api/forms/application
 Content-Type: {{contentType}}
 
 {
-  "recruiter_id": "test-recruiter-123",
+  "staff_id": "test-recruiter-123",
   "title": "Software Engineering Assessment",
   "description": "This form is used to evaluate software engineering candidates."
 }

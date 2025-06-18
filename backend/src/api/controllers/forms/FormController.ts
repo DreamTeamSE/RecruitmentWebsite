@@ -16,8 +16,8 @@ export const getFeed = async (req: Request, res: Response) => {
 // POST /forms
 export const createForm = async (req: Request, res: Response) => {
   try {
-    const { recruiter_id, title, description } = req.body;
-    const form = { recruiter_id, title, description };
+    const { staff_id, title, description } = req.body;
+    const form = { staff_id, title, description };
     const insertedForm = await insertForm(form);
     res.status(201).json({ message: "Form created", insertedForm });
   } catch (error) {
@@ -78,6 +78,12 @@ export const createQuestion = async (req: Request, res: Response) => {
 // GET /forms/:id
 export const getFormById = async (req: Request, res: Response) => {
   const formId = parseInt(req.params.id);
+
+  // Validate formId
+  if (isNaN(formId)) {
+    res.status(404).json({ message: "Form not found", error: "Invalid form ID" });
+    return;
+  }
 
   try {
     const form = await selectFormById(formId);

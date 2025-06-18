@@ -16,7 +16,7 @@ const ArrowLeft = () => (
 interface CreateApplicationFormData {
   title: string;
   description: string;
-  recruiter_id: string;
+  staff_id: string;
   questions: ApplicationQuestion[];
 }
 
@@ -24,7 +24,7 @@ const CreateApplicationForm: React.FC = () => {
   const [formData, setFormData] = useState<CreateApplicationFormData>({
     title: '',
     description: '',
-    recruiter_id: '',
+    staff_id: '',
     questions: []
   });
 
@@ -124,7 +124,7 @@ const CreateApplicationForm: React.FC = () => {
     const missingFields: string[] = [];
     if (!formData.title.trim()) missingFields.push('Application Title');
     if (!formData.description.trim()) missingFields.push('Description');
-    if (!formData.recruiter_id.trim()) missingFields.push('Recruiter Selection');
+    if (!formData.staff_id.trim()) missingFields.push('Staff Selection');
     
     if (missingFields.length > 0) {
       alert(`Please fill in the following required fields:\n• ${missingFields.join('\n• ')}`);
@@ -141,7 +141,7 @@ const CreateApplicationForm: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          recruiter_id: formData.recruiter_id,
+          staff_id: formData.staff_id,
           title: formData.title,
           description: formData.description,
         }),
@@ -259,7 +259,7 @@ const CreateApplicationForm: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="recruiter_id" className="block text-lg font-semibold text-gray-800 mb-2">
+                <label htmlFor="staff_id" className="block text-lg font-semibold text-gray-800 mb-2">
                   Recruiter *
                 </label>
                 {loadingRecruiters ? (
@@ -269,9 +269,9 @@ const CreateApplicationForm: React.FC = () => {
                   </div>
                 ) : (
                   <select
-                    id="recruiter_id"
-                    name="recruiter_id"
-                    value={formData.recruiter_id}
+                    id="staff_id"
+                    name="staff_id"
+                    value={formData.staff_id}
                     onChange={handleInputChange}
                     required
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

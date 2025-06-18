@@ -4,16 +4,16 @@ import { Form } from '../../model/application/Form';
 import { Question } from '../../model/application/Question';
 
 const insertForm = async (
-    form: { recruiter_id: string; title: string; description: string }
+    form: { staff_id: string; title: string; description: string }
 ): Promise<Form> => {
     const client = await psql_client.connect();
     try {
         const query = `
-            INSERT INTO Forms (recruiter_id, title, description)
+            INSERT INTO Forms (staff_id, title, description)
             VALUES ($1, $2, $3)
             RETURNING *;
         `;
-        const values = [form.recruiter_id, form.title, form.description];
+        const values = [form.staff_id, form.title, form.description];
         const result: QueryResult = await client.query(query, values);
         return result.rows[0];
     } finally {
@@ -123,10 +123,9 @@ const deleteFormById = async (formId: number): Promise<Form> => {
         SELECT id FROM Questions WHERE form_id = $1
       )
     `, [formId]);
-    
-    // Delete associated recruiter notes
+      // Delete associated staff notes (updated table name)
     await client.query(`
-      DELETE FROM RecruiterApplicationNotes 
+      DELETE FROM StaffApplicationNotes 
       WHERE form_entry_id IN (
         SELECT id FROM FormEntries WHERE form_id = $1
       )
