@@ -10,9 +10,9 @@ export default withAuth(
         // Check if user has a valid token
         if (!token) return false
         
-        // Check if user's email is verified for protected routes
-        if (req.nextUrl.pathname.startsWith("/applications-review")) {
-          return Boolean(token.emailVerified)
+        // Require email verification for ALL protected routes
+        if (!token.emailVerified) {
+          return false
         }
         
         return true

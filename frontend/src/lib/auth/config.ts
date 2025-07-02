@@ -46,27 +46,21 @@ export const authOptions: NextAuthOptions = {
 
           const data = await response.json()
           
+          // Ensure the account is verified before allowing login
+          if (!data.staff.emailVerified) {
+            throw new Error("Please verify your email address before signing in")
+          }
+          
           // Return user object that NextAuth expects
           return {
             id: data.staff.id,
             email: data.staff.email,
             name: `${data.staff.first_name} ${data.staff.last_name}`,
             role: data.staff.role || "staff",
-            emailVerified: data.staff.email_verified || false,
+            emailVerified: data.staff.emailVerified,
           }
         } catch (error) {
-          // For now, fallback to hardcoded admin for testing
-          // TODO: Remove this fallback once backend auth is ready
-          if (credentials.email === "admin@dreamteameng.org" && credentials.password === "password123") {
-            return {
-              id: "1",
-              email: credentials.email,
-              name: "Test Admin",
-              role: "admin",
-              emailVerified: true,
-            }
-          }
-          throw new Error("Invalid credentials")
+          throw new Error(error instanceof Error ? error.message : "Authentication failed")
         }
       }
     })
