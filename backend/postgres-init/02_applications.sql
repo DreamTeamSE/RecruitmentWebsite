@@ -1,6 +1,6 @@
 CREATE TABLE Forms (
   id SERIAL PRIMARY KEY,
-  recruiter_id TEXT NOT NULL REFERENCES Recruiters(uuid),
+  staff_id UUID NOT NULL REFERENCES staff(id),
   title TEXT NOT NULL,
   description TEXT,
   created_at TIMESTAMP DEFAULT now()
@@ -35,7 +35,7 @@ CREATE TABLE Answers (
 );
 
 
-CREATE TABLE RecruiterApplicationNotes (
+CREATE TABLE StaffApplicationNotes (
   id SERIAL PRIMARY KEY,
   form_entry_id INTEGER UNIQUE REFERENCES FormEntries(id),
   notes TEXT,

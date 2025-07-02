@@ -1,0 +1,13 @@
+### Applicants API Endpoints
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Create a new applicant
+POST {{baseUrl}}/api/applicant/create
+Content-Type: {{contentType}}
+
+{
+  "first_name": "Jane",
+  "last_name": "Smith"
+}

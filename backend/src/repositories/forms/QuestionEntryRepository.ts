@@ -52,5 +52,28 @@ const insertQuestion = async (question : {
     }
 }
 
+const deleteQuestion = async (questionId: number): Promise<Question> => {
+    const client = await psql_client.connect();
+    try {
+        const query = `
+            DELETE FROM Questions 
+            WHERE id = $1 
+            RETURNING *;
+        `;
+        const values = [questionId];
+        const result: QueryResult = await client.query(query, values);
+        
+        if (result.rows.length === 0) {
+            throw new Error(`Question with id ${questionId} not found`);
+        }
+        
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error deleting question:', error);
+        throw error;
+    } finally {
+        client.release();
+    }
+};
 
-export{ insertQuestion, retrieveQuestions };
+export{ insertQuestion, retrieveQuestions, deleteQuestion };

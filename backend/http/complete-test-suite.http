@@ -1,0 +1,128 @@
+### Complete API Test Suite
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### Test Flow: Complete CRUD Operations
+
+### 1. Create a recruiter first
+# @name createRecruiter
+POST {{baseUrl}}/api/recruiter/create
+Content-Type: {{contentType}}
+
+{
+  "uuid": "test-recruiter-uuid-123",
+  "first_name": "Test",
+  "last_name": "Recruiter"
+}
+
+### 2. Create an applicant
+# @name createApplicant
+POST {{baseUrl}}/api/applicant/create
+Content-Type: {{contentType}}
+
+{
+  "first_name": "Test",
+  "last_name": "Applicant"
+}
+
+### 3. Create a form
+# @name createForm
+POST {{baseUrl}}/api/forms/application
+Content-Type: {{contentType}}
+
+{
+  "staff_id": "test-recruiter-uuid-123",
+  "title": "Full Stack Developer Assessment",
+  "description": "Comprehensive assessment for full stack developer position."
+}
+
+### 4. Create questions for the form
+# @name createQuestion1
+POST {{baseUrl}}/api/forms/entry/question
+Content-Type: {{contentType}}
+
+{
+  "form_id": "{{createForm.response.body.insertedForm.id}}",
+  "question_text": "What is your experience with React?",
+  "question_type": "text",
+  "question_order": 1
+}
+
+### 5. Create another question
+# @name createQuestion2
+POST {{baseUrl}}/api/forms/entry/question
+Content-Type: {{contentType}}
+
+{
+  "form_id": "{{createForm.response.body.insertedForm.id}}",
+  "question_text": "Describe your backend development experience",
+  "question_type": "text",
+  "question_order": 2
+}
+
+### 6. Create a form entry (application)
+# @name createFormEntry
+POST {{baseUrl}}/api/forms/entry/application
+Content-Type: {{contentType}}
+
+{
+  "applicant_id": "{{createApplicant.response.body.inserted_applicant.id}}",
+  "form_id": "{{createForm.response.body.insertedForm.id}}"
+}
+
+### 7. Create answers
+# @name createAnswer1
+POST {{baseUrl}}/api/forms/entry/answer/text
+Content-Type: {{contentType}}
+
+{
+  "applicant_id": "{{createApplicant.response.body.inserted_applicant.id}}",
+  "question_id": "{{createQuestion1.response.body.question.id}}",
+  "answer_type": "text",
+  "answer_text": "I have 3 years of experience with React, including hooks and context API.",
+  "form_entry_id": "{{createFormEntry.response.body.formEntry.id}}"
+}
+
+### 8. Create second answer
+# @name createAnswer2
+POST {{baseUrl}}/api/forms/entry/answer/text
+Content-Type: {{contentType}}
+
+{
+  "applicant_id": "{{createApplicant.response.body.inserted_applicant.id}}",
+  "question_id": "{{createQuestion2.response.body.question.id}}",
+  "answer_type": "text",
+  "answer_text": "I have experience with Node.js, Express, and PostgreSQL for backend development.",
+  "form_entry_id": "{{createFormEntry.response.body.formEntry.id}}"
+}
+
+### 9. Create an interview
+# @name createInterview
+POST {{baseUrl}}/api/interview/page
+Content-Type: {{contentType}}
+
+{
+  "form_id": "{{createForm.response.body.insertedForm.id}}",
+  "created_by": "test-recruiter-uuid-123"
+}
+
+### 10. Create an interview entry
+# @name createInterviewEntry
+POST {{baseUrl}}/api/interview/entry
+Content-Type: {{contentType}}
+
+{
+  "interview_id": "{{createInterview.response.body.inserted_interview.id}}",
+  "form_entry_id": "{{createFormEntry.response.body.formEntry.id}}",
+  "selected_by": "test-recruiter-uuid-123"
+}
+
+### 10. Get all data to verify
+GET {{baseUrl}}/api/forms/feed
+
+### 11. Get questions for the form
+GET {{baseUrl}}/api/forms/entry/question?form_id={{createForm.response.body.insertedForm.id}}
+
+### 12. Get answers for the form entry
+GET {{baseUrl}}/api/forms/entry/answer?form_entry_id={{createFormEntry.response.body.formEntry.id}}

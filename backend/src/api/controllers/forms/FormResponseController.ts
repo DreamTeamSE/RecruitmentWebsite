@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { insertFormEntry, } from "../../../repositories/forms/FormEntryRepository";
-import { insertQuestion, retrieveQuestions } from "../../../repositories/forms/QuestionEntryRepository";
+import { insertQuestion, retrieveQuestions, deleteQuestion } from "../../../repositories/forms/QuestionEntryRepository";
 import { insertAnswer, retrieveAnswer } from "../../../repositories/forms/AnswerEntryRepository";
 // Questions
 export const getQuestions = async (req: Request, res: Response) => {
@@ -69,6 +69,29 @@ export const getAnswersByFormEntryId = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error retrieving Answers:", (error as Error).message);
     res.status(500).json({ message: "Failed to retrieve Answers", error: (error as Error).message });
+  }
+};
+
+// Questions
+export const deleteQuestionById = async (req: Request, res: Response) => {
+  try {
+    const questionId = parseInt(req.params.questionId);
+    
+    if (isNaN(questionId)) {
+      res.status(400).json({ message: "Invalid question ID. It must be a number." });
+      return;
+    }
+
+    const deletedQuestion = await deleteQuestion(questionId);
+    console.log("Question deleted successfully:", deletedQuestion);
+    res.status(200).json({ message: "Question deleted successfully", question: deletedQuestion });
+  } catch (error) {
+    if ((error as Error).message.includes('not found')) {
+      res.status(404).json({ message: "Question not found", error: (error as Error).message });
+    } else {
+      console.error("Error deleting question:", (error as Error).message);
+      res.status(500).json({ message: "Failed to delete question", error: (error as Error).message });
+    }
   }
 };
 

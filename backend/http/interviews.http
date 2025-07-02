@@ -1,0 +1,23 @@
+### Interviews API Endpoints
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+### 1. Create a new interview
+POST {{baseUrl}}/api/interview/page
+Content-Type: {{contentType}}
+
+{
+  "form_id": 1,
+  "created_by": "recruiter-uuid-123"
+}
+
+### 2. Create an interview entry
+POST {{baseUrl}}/api/interview/entry
+Content-Type: {{contentType}}
+
+{
+  "interview_id": 1,
+  "form_entry_id": 1,
+  "selected_by": "recruiter-uuid-123"
+}
