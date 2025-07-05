@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
-import { useRouter } from 'next/router';
 
 const FormApplicationCard: React.FC<ApplicationFormData> = ({ id, title, description, created_at }) => {
   const formattedDate = new Date(created_at).toLocaleDateString('en-US', {
@@ -26,7 +25,6 @@ const FormApplicationCard: React.FC<ApplicationFormData> = ({ id, title, descrip
 };
 
 export default function ApplicationsSection() {
-  const router = useRouter();
   const [forms, setForms] = React.useState<ApplicationFormData[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -48,16 +46,8 @@ export default function ApplicationsSection() {
     loadForms();
   }, []);
 
-  const handleFormSubmission = async (formId: number) => {
-    try {
-      // Simulate form submission logic
-      await fetch(`/api/forms/${formId}/submit`, { method: 'POST' });
-
-      // Redirect to the Thank You page
-      router.push('/get-involved/join-dte/thank-you');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
+  const handleCardClick = (formId: number) => {
+    window.location.href = `/get-involved/join-dte/${formId}`;
   };
 
   if (isLoading) {
@@ -100,7 +90,7 @@ export default function ApplicationsSection() {
           {forms.map((form) => (
             <button
               key={form.id}
-              onClick={() => handleFormSubmission(form.id)}
+              onClick={() => handleCardClick(form.id)}
               className="block group bg-background p-4 sm:p-6 rounded-[var(--radius)] shadow-md hover:shadow-lg transition-shadow duration-300"
             >
               <h3 className="text-base sm:text-lg font-semibold text-primary group-hover:underline mb-1">

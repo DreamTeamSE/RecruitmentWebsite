@@ -305,8 +305,8 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       console.log("Created Applicant:", applicantResult.inserted_applicant);
       console.log("Created Form Entry:", formEntryResult.formEntry);
       
-      // Return the inserted_applicant as requested
-      return applicantResult.inserted_applicant;
+      // Redirect to Thank You page after successful submission
+      window.location.href = '/get-involved/join-dte/thank-you';
       
     } catch (error) {
       console.error("Error submitting application:", error);
