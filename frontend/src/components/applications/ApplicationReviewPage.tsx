@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Search, ChevronDown, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { Applicant } from '@/models/types/application';
+import axios from 'axios';
+
 // Define the structure for an individual applicant
-
-
 const ApplicantCard: React.FC<Applicant> = ({ name, appliedDate, score, applicationLink }) => {
   return (
     // Make the card a link if applicationLink is provided
@@ -42,9 +42,9 @@ export interface ApplicationReviewClientPageProps {
 export default function ApplicationReviewClientPage({
   applicationId,
   applicationName,
-  applicationTerm,
-  submittedApplicants
+  applicationTerm
 }: ApplicationReviewClientPageProps) {
+  const [submittedApplicants, setSubmittedApplicants] = useState<Applicant[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOption] = useState('All Applications');
   const [isLoading, setIsLoading] = useState(true);
@@ -52,17 +52,24 @@ export default function ApplicationReviewClientPage({
 
   useEffect(() => {
     setMounted(true); // Ensure client-side specific logic runs after mount
-    if (submittedApplicants) {
-      setIsLoading(false);
+    async function fetchApplicants() {
+      try {
+        const response = await axios.get(`/api/forms/${applicationId}/entries`);
+        setSubmittedApplicants(response.data.entries);
+      } catch (error) {
+        console.error("Error fetching applicants:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [submittedApplicants]);
+
+    fetchApplicants();
+  }, [applicationId]);
 
   const filteredApplicants = useMemo(() => {
     if (!submittedApplicants) return [];
     return submittedApplicants.filter(applicant =>
       applicant.name.toLowerCase().includes(searchTerm.toLowerCase())
-      // TODO: Add more filtering logic based on filterOption if needed
-      // e.g., if (filterOption === 'Scored') return applicant.score !== undefined;
     );
   }, [searchTerm, submittedApplicants]);
 

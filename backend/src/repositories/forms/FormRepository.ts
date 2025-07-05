@@ -184,4 +184,20 @@ const insertQuestion = async (
   }
 };
 
-export { insertForm, selectFeed, selectFormById, deleteFormById, deleteQuestionById, insertQuestion };
+const selectFormEntriesById = async (formId: number): Promise<any[]> => {
+  const query = `
+    SELECT * FROM FormEntries WHERE form_id = $1;
+  `;
+  const client = await psql_client.connect();
+  try {
+    const result: QueryResult = await client.query(query, [formId]);
+    return result.rows;
+  } catch (error) {
+    console.error('Error retrieving form entries:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export { insertForm, selectFeed, selectFormById, deleteFormById, deleteQuestionById, insertQuestion, selectFormEntriesById };

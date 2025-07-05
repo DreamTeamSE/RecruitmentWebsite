@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertForm, selectFeed, updateFormById, selectFormById, deleteFormById, deleteQuestionById, insertQuestion } from "../../../repositories/forms/FormRepository";
+import { insertForm, selectFeed, updateFormById, selectFormById, deleteFormById, deleteQuestionById, insertQuestion, selectFormEntriesById } from "../../../repositories/forms/FormRepository";
 
 // GET /forms
 export const getFeed = async (req: Request, res: Response) => {
@@ -133,5 +133,18 @@ export const deleteForm = async (req: Request, res: Response) => {
     } else {
       res.status(500).json({ message: "Error deleting form", error: (error as Error).message });
     }
+  }
+};
+
+// GET /forms/:formId/entries
+export const getFormEntries = async (req: Request, res: Response) => {
+  const formId = parseInt(req.params.formId);
+
+  try {
+    const entries = await selectFormEntriesById(formId);
+    res.status(200).json({ entries });
+  } catch (error) {
+    console.error("Error retrieving form entries:", (error as Error).message);
+    res.status(500).json({ message: "Failed to retrieve form entries", error: (error as Error).message });
   }
 };

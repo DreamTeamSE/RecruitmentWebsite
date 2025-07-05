@@ -6,6 +6,7 @@ import {
     validateStaffPassword 
 } from "../../../repositories/user/StaffRepository";
 import * as nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
 
 // Email configuration - you'll need to set up environment variables
 const transporter = nodemailer.createTransport({
@@ -48,6 +49,16 @@ const sendVerificationEmail = async (email: string, token: string, firstName: st
     await transporter.sendMail(mailOptions);
 };
 
+// In-memory store for pending verifications (use Redis for production)
+const pendingVerifications: Record<string, {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  token: string;
+  expires: number;
+}> = {};
+
 export const register = async (req: Request, res: Response) => {
     try {
         const { firstName, lastName, email, password } = req.body;
@@ -73,7 +84,7 @@ export const register = async (req: Request, res: Response) => {
             });
         }
 
-        // Check if user already exists
+        // Check if user already exists in DB
         const existingStaff = await findStaffByEmail(email);
         if (existingStaff) {
             return res.status(409).json({ 
@@ -81,26 +92,40 @@ export const register = async (req: Request, res: Response) => {
             });
         }
 
-        // Create staff account
-        const staff = await createStaff({
+        // Check if a pending verification exists
+        if (pendingVerifications[email]) {
+            // Check if token is still valid (24h)
+            if (pendingVerifications[email].expires > Date.now()) {
+                return res.status(409).json({
+                  message: "An unverified account with this email already exists. Please check your email for the verification link or contact support."
+                });
+            } else {
+                // Expired, remove it
+                delete pendingVerifications[email];
+            }
+        }
+
+        // Generate verification token
+        const token = uuidv4();
+        const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        pendingVerifications[email] = {
             firstName,
             lastName,
             email,
             password,
-        });
+            token,
+            expires
+        };
 
         // Send verification email
         try {
-            await sendVerificationEmail(email, staff.email_verification_token!, firstName);
+            await sendVerificationEmail(email, token, firstName);
         } catch (emailError) {
             console.error("Failed to send verification email:", emailError);
-            // Don't fail the registration if email sending fails
         }
 
-        console.log("Staff account created successfully:", staff.id);
-        res.status(201).json({ 
+        res.status(201).json({
             message: "Account created successfully. Please check your email to verify your account.",
-            userId: staff.id 
         });
     } catch (error) {
         console.error("Error creating staff account:", (error as Error).message);
@@ -166,12 +191,33 @@ export const verifyEmail = async (req: Request, res: Response) => {
             });
         }
 
-        const isVerified = await verifyStaffEmail(token);
-        if (!isVerified) {
+        // Find pending verification by token
+        const pending = Object.values(pendingVerifications).find(v => v.token === token && v.expires > Date.now());
+        if (!pending) {
             return res.status(400).json({ 
                 message: "Invalid or expired verification token" 
             });
         }
+
+        // Double-check not already in DB
+        const existingStaff = await findStaffByEmail(pending.email);
+        if (existingStaff) {
+            delete pendingVerifications[pending.email];
+            return res.status(409).json({ 
+                message: "An account with this email already exists" 
+            });
+        }
+
+        // Create staff account in DB
+        await createStaff({
+            firstName: pending.firstName,
+            lastName: pending.lastName,
+            email: pending.email,
+            password: pending.password,
+        });
+
+        // Remove from pending
+        delete pendingVerifications[pending.email];
 
         res.status(200).json({ 
             message: "Email verified successfully" 

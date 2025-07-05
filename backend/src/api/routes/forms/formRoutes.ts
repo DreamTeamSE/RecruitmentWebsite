@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getFeed, createForm, updateForm, getFormById, deleteForm, deleteQuestion, createQuestion, deleteQuestionOnly } from '../../controllers/forms/FormController';
+import { getFeed, createForm, updateForm, getFormById, deleteForm, deleteQuestion, createQuestion, deleteQuestionOnly, getFormEntries } from '../../controllers/forms/FormController';
 
 const router = Router();
 
@@ -26,5 +26,8 @@ router.delete('/:formId/questions/:questionId', deleteQuestion);
 
 // DELETE /api/questions/:questionId - Delete a question by ID only
 router.delete('/questions/:questionId', deleteQuestionOnly);
+
+// GET /api/forms/:formId/entries
+router.get('/:formId/entries', getFormEntries);
 
 export default router;

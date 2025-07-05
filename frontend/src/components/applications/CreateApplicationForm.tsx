@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ApplicationQuestion } from '@/models/types/application';
-import { Recruiter, RecruiterResponse } from '@/models/types/recruiter';
 import { BACKEND_URL } from '@/lib/constants/string';
+import { useSession } from "next-auth/react";
 
 const ArrowLeft = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
@@ -21,15 +21,13 @@ interface CreateApplicationFormData {
 }
 
 const CreateApplicationForm: React.FC = () => {
+  const { data: session } = useSession();
   const [formData, setFormData] = useState<CreateApplicationFormData>({
     title: '',
     description: '',
     staff_id: '',
     questions: []
   });
-
-  const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
-  const [loadingRecruiters, setLoadingRecruiters] = useState(true);
 
   const [newQuestion, setNewQuestion] = useState<Partial<ApplicationQuestion>>({
     questionText: '',
@@ -41,26 +39,12 @@ const CreateApplicationForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
 
-  // Fetch recruiters on component mount
+  // Auto-assign staff_id to the logged-in user's id
   useEffect(() => {
-    const fetchRecruiters = async () => {
-      try {
-        const response = await fetch(`http://${BACKEND_URL}/api/recruiter`);
-        if (response.ok) {
-          const data: RecruiterResponse = await response.json();
-          setRecruiters(data.recruiters);
-        } else {
-          console.error('Failed to fetch recruiters');
-        }
-      } catch (error) {
-        console.error('Error fetching recruiters:', error);
-      } finally {
-        setLoadingRecruiters(false);
-      }
-    };
-
-    fetchRecruiters();
-  }, []);
+    if (session?.user?.id) {
+      setFormData(prev => ({ ...prev, staff_id: session.user.id }));
+    }
+  }, [session?.user?.id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -256,37 +240,6 @@ const CreateApplicationForm: React.FC = () => {
                   rows={4}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
                 />
-              </div>
-
-              <div>
-                <label htmlFor="staff_id" className="block text-lg font-semibold text-gray-800 mb-2">
-                  Recruiter *
-                </label>
-                {loadingRecruiters ? (
-                  <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                    Loading recruiters...
-                  </div>
-                ) : (
-                  <select
-                    id="staff_id"
-                    name="staff_id"
-                    value={formData.staff_id}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select a recruiter...</option>
-                    {recruiters.map((recruiter) => (
-                      <option key={recruiter.id} value={recruiter.id}>
-                        {recruiter.first_name} {recruiter.last_name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <p className="mt-1 text-sm text-gray-600">
-                  Select the recruiter who will manage this application form.
-                </p>
               </div>
             </div>
 
