@@ -27,7 +27,7 @@ export default function AuthGuard({
     }
 
     // Check if email is verified for authenticated users
-    if (requireAuth && session && !session.user.emailVerified) {
+    if (requireAuth && session && session.user && !(session.user as { emailVerified?: boolean }).emailVerified) {
       router.push("/auth/verify-request")
       return
     }
@@ -46,7 +46,7 @@ export default function AuthGuard({
   }
 
   // Don't render children if authentication is required but user is not authenticated
-  if (requireAuth && (status === "unauthenticated" || (session && !session.user.emailVerified))) {
+  if (requireAuth && (status === "unauthenticated" || (session && session.user && !(session.user as any).emailVerified))) {
     return null
   }
 
