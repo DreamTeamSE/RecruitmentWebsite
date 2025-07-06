@@ -29,7 +29,7 @@ export const authOptions: any = {
 
         try {
           // Call our backend API to authenticate the staff member
-          const backendUrl = 'https://d2oc9fk5wyihzt.cloudfront.net';
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://d2oc9fk5wyihzt.cloudfront.net';
           const response = await fetch(`${backendUrl}/api/auth/login`, {
             method: 'POST',
             headers: {
