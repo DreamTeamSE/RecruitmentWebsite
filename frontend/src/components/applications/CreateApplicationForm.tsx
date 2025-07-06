@@ -40,10 +40,10 @@ const CreateApplicationForm: React.FC = () => {
 
   // Auto-assign staff_id to the logged-in user's id
   useEffect(() => {
-    if (session?.user?.id) {
-      setFormData(prev => ({ ...prev, staff_id: session.user.id }));
+    if (session?.user && 'id' in session.user) {
+      setFormData(prev => ({ ...prev, staff_id: (session.user as { id: string }).id }));
     }
-  }, [session?.user?.id]);
+  }, [session?.user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
