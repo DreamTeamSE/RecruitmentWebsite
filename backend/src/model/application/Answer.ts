@@ -5,5 +5,6 @@ export interface Answer {
     applicant_id: number;
     question_id: number;
     answer_type: QuestionType;
-
-  }
+    form_entry_id: number;
+    answer_text?: string;
+}

@@ -68,7 +68,8 @@ Content-Type: {{contentType}}
 
 {
   "applicant_id": "{{createApplicant.response.body.inserted_applicant.id}}",
-  "form_id": "{{createForm.response.body.insertedForm.id}}"
+  "form_id": "{{createForm.response.body.insertedForm.id}}",
+  "applicant_email": "test.applicant@example.com"
 }
 
 ### 7. Create answers

@@ -21,7 +21,7 @@ export interface ApplicantSubmission {
   id: string; // Applicant's unique submission ID (e.g., "max-martin-sw")
   firstName: string;
   lastName: string;
-  email?: string;
+  email: string;
   appliedDate?: string;
   answers: ApplicantAnswer[]; // Array of answers provided by the applicant
   // Fields for reviewer - these would typically be saved/fetched from a database for persistence
@@ -42,7 +42,7 @@ export interface ApplicationTypeForReview {
 // This is the combined data structure that the individual review page component will expect as a prop
 export interface IndividualReviewPageDisplayData {
   applicationName: string;
-  applicationTerm: string;
+  applicationDescription: string;
   applicantSubmission: ApplicantSubmission;
   applicationQuestions: ApplicationQuestion[]; // The original questions to display alongside answers
 }

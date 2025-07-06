@@ -7,6 +7,7 @@ import { Search, ChevronDown, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { Applicant } from '@/models/types/application';
 import axios from 'axios';
+import { BACKEND_URL } from '@/lib/constants/string';
 
 // Define the structure for an individual applicant
 const ApplicantCard: React.FC<Applicant> = ({ name, appliedDate, score, applicationLink }) => {
@@ -32,17 +33,28 @@ const ApplicantCard: React.FC<Applicant> = ({ name, appliedDate, score, applicat
   );
 };
 
+interface FormEntriesResponse {
+  formTitle: string;
+  entries: {
+    id: number;
+    applicant_id: number;
+    form_id: number;
+    submitted_at: string;
+    applicant: {
+      first_name: string;
+      last_name: string;
+    } | null;
+  }[];
+}
+
 export interface ApplicationReviewClientPageProps {
   applicationId: string;
   applicationName: string;
-  applicationTerm: string;
-  submittedApplicants: Applicant[];
 }
 
 export default function ApplicationReviewClientPage({
   applicationId,
-  applicationName,
-  applicationTerm
+  applicationName
 }: ApplicationReviewClientPageProps) {
   const [submittedApplicants, setSubmittedApplicants] = useState<Applicant[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,8 +66,18 @@ export default function ApplicationReviewClientPage({
     setMounted(true); // Ensure client-side specific logic runs after mount
     async function fetchApplicants() {
       try {
-        const response = await axios.get(`/api/forms/${applicationId}/entries`);
-        setSubmittedApplicants(response.data.entries);
+        const response = await axios.get<FormEntriesResponse>(`http://${BACKEND_URL}/api/forms/${applicationId}/entries`);
+        
+        // Map the backend response to the frontend Applicant format
+        const mappedApplicants: Applicant[] = response.data.entries.map((entry) => ({
+          id: entry.id.toString(),
+          name: entry.applicant ? `${entry.applicant.first_name} ${entry.applicant.last_name}` : `Applicant ID: ${entry.applicant_id}`,
+          appliedDate: new Date(entry.submitted_at).toLocaleDateString(),
+          score: undefined,
+          applicationLink: `/applications-review/${applicationId}/${entry.id}`,
+        }));
+        
+        setSubmittedApplicants(mappedApplicants);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       } finally {
@@ -85,7 +107,7 @@ export default function ApplicationReviewClientPage({
       <section className="py-12 sm:py-16 bg-[#F3F4F9] min-h-screen">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground font-serif mb-10">
-            {applicationName} <span className="text-primary">|</span> {applicationTerm}
+            {applicationName}
           </h1>
           <p className="text-muted-foreground text-lg">Loading applications...</p>
           {/* You could add a spinner component here */}
@@ -99,7 +121,7 @@ export default function ApplicationReviewClientPage({
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-10 relative">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground font-serif">
-            {applicationName} <span className="text-primary">|</span> {applicationTerm}
+            {applicationName}
           </h1>
           {/* Edit button positioned absolutely in top right */}
           <Link 

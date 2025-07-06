@@ -62,9 +62,10 @@ interface ApplicationTemplateProps {
 }
 
 const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId }) => {
-  const [formData, setFormData] = useState<{ firstName: string; lastName: string; [key: string]: string }>({
+  const [formData, setFormData] = useState<{ firstName: string; lastName: string; email: string; [key: string]: string }>({
     firstName: '',
     lastName: '',
+    email: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentForm, setCurrentForm] = useState<ApplicationFormData | null>(null);
@@ -173,6 +174,21 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
     setIsSubmitting(true);
     
     try {
+      // Validation
+      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+        alert('Please fill in all required fields: First Name, Last Name, and Email Address.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        alert('Please enter a valid email address.');
+        setIsSubmitting(false);
+        return;
+      }
+
       // Step 1: Create the applicant
       const applicantResponse = await fetch(`http://${BACKEND_URL}/api/applicant/create`, {
         method: 'POST',
@@ -208,6 +224,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
         body: JSON.stringify({
           applicant_id: applicant_id,
           form_id: form_id,
+          applicant_email: formData.email, // Email is now required
         }),
       });
 
@@ -407,6 +424,21 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
                     placeholder="Enter your last name"
                   />
                 </div>
+              </div>
+              <div className="mt-4">
+                <label htmlFor="email" className="block text-lg font-semibold text-gray-800 mb-2">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your email address"
+                />
               </div>
             </div>
 

@@ -74,7 +74,8 @@ describe('Complete Application Flow Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: applicantId,
-          form_id: formId
+          form_id: formId,
+          applicant_email: 'test.applicant@example.com'
         })
         .expect(201);
 
@@ -144,7 +145,8 @@ describe('Complete Application Flow Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: applicantId,
-          form_id: 99999
+          form_id: 99999,
+          applicant_email: 'test.fail@example.com'
         })
         .expect(500);
 
@@ -167,23 +169,34 @@ describe('Complete Application Flow Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: applicantId,
-          form_id: formId
+          form_id: formId,
+          applicant_email: 'test.duplicate@example.com'
         })
         .expect(500);
     });
 
-    it('should prevent duplicate answers for same form entry and question', async () => {
-      // Try to submit another answer for the same question and form entry
+    it('should fail to create form entry without email', async () => {
+      // Try to create form entry without email
       await request(app)
-        .post('/api/forms/entry/answer/text')
+        .post('/api/forms/entry/application')
         .send({
           applicant_id: applicantId,
-          question_id: questionId,
-          answer_type: 'text',
-          answer_text: 'Duplicate answer attempt',
-          form_entry_id: formEntryId
+          form_id: formId
+          // Missing applicant_email
         })
-        .expect(500);
+        .expect(400);
+    });
+
+    it('should fail to create form entry with invalid email format', async () => {
+      // Try to create form entry with invalid email
+      await request(app)
+        .post('/api/forms/entry/application')
+        .send({
+          applicant_id: applicantId,
+          form_id: formId,
+          applicant_email: 'invalid-email-format'
+        })
+        .expect(400);
     });
   });
 

@@ -24,4 +24,17 @@ const insertApplicant = async (
     }
 };
 
-export{ insertApplicant };
+const selectApplicantById = async (applicantId: number): Promise<Applicant | null> => {
+  const client = await psql_client.connect();
+  try {
+    const query = `
+      SELECT * FROM Applicants WHERE id = $1;
+    `;
+    const result: QueryResult = await client.query(query, [applicantId]);
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+};
+
+export { insertApplicant, selectApplicantById };

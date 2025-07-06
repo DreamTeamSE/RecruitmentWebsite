@@ -98,8 +98,24 @@ export const deleteQuestionById = async (req: Request, res: Response) => {
 // Form
 export const createFormEntry = async (req: Request, res: Response) => {
   try {
-    const { applicant_id, form_id } = req.body;
-    const form_entry = { applicant_id, form_id };
+    const { applicant_id, form_id, applicant_email } = req.body;
+    
+    // Validate required fields
+    if (!applicant_id || !form_id || !applicant_email) {
+      return res.status(400).json({ 
+        message: "Missing required fields: applicant_id, form_id, and applicant_email are required" 
+      });
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(applicant_email)) {
+      return res.status(400).json({ 
+        message: "Invalid email format" 
+      });
+    }
+
+    const form_entry = { applicant_id, form_id, applicant_email };
     const inserted_form_entry = await insertFormEntry(form_entry);
     console.log("Form entry created successfully:", inserted_form_entry);
     res.status(201).json({ message: "Form entry created", formEntry: inserted_form_entry });

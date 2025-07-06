@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ApplicationQuestion, ApplicationTypeForReview, IndividualReviewPageDisplayData } from '@/models/types/application';
 
 // Define questions for each application type based on the filledApplicationData
@@ -366,28 +367,54 @@ export const allApplicationTypesForReview: ApplicationTypeForReview[] = [
 ];
 
 // Helper function to get individual applicant review data
-export function getIndividualApplicantReviewDisplayData(
+export async function getIndividualApplicantReviewDisplayData(
   applicationId: string,
   applicantSubmissionId: string
-): IndividualReviewPageDisplayData | undefined {
-  const applicationType = allApplicationTypesForReview.find(app => app.id === applicationId);
+): Promise<IndividualReviewPageDisplayData | undefined> {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
+    const data = response.data as {
+      applicationName: string;
+      applicationDescription: string;
+      applicationQuestions: ApplicationQuestion[];
+      applicantSubmission: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        appliedDate: string;
+        answers: { questionId: string; answer: string }[];
+        currentNotes: string;
+        currentScore: string;
+      };
+    };
 
-  if (!applicationType) {
-    console.error(`Application type with ID "${applicationId}" not found.`);
+    if (!data) {
+      console.error(`Applicant submission with ID "${applicantSubmissionId}" not found for application type "${applicationId}".`);
+      return undefined;
+    }
+
+    return {
+      applicationName: data.applicationName,
+      applicationDescription: data.applicationDescription,
+      applicationQuestions: data.applicationQuestions,
+      applicantSubmission: data.applicantSubmission,
+    };
+  } catch (error) {
+    console.error("Error fetching individual applicant review data:", error);
     return undefined;
   }
-
-  const applicantSubmission = applicationType.submissions.find(sub => sub.id === applicantSubmissionId);
-
-  if (!applicantSubmission) {
-    console.error(`Applicant submission with ID "${applicantSubmissionId}" not found for application type "${applicationId}".`);
-    return undefined;
-  }
-
-  return {
-    applicationName: applicationType.name,
-    applicationTerm: applicationType.term,
-    applicationQuestions: applicationType.questions,
-    applicantSubmission: applicantSubmission,
-  };
 }
+
+export async function fetchApplicationData(applicationId: string) {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries`);
+    return (response.data as { entries: any[] }).entries;
+  } catch (error) {
+    console.error("Error fetching application data:", error);
+    return [];
+  }
+}
+
+// Example usage
+fetchApplicationData('software-fall-2025').then(data => console.log(data));

@@ -1,31 +1,44 @@
 // src/lib/util/applicant.util.ts
 
 import { IndividualReviewPageDisplayData } from '@/models/types/application';
-import { allApplicationTypesForReview } from '../data/applicant/applicantIDData';
+import axios from 'axios';
 
 // ✅ Mark function async
 export async function getIndividualApplicantReviewDisplayData(
   applicationId: string,
   applicantSubmissionId: string
 ): Promise<IndividualReviewPageDisplayData | undefined> {
-  const applicationType = allApplicationTypesForReview.find(app => app.id === applicationId);
+  try {
+    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
+    const data = response.data as {
+      applicationName: string;
+      applicationDescription: string;
+      applicationQuestions: any[];
+      applicantSubmission: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        appliedDate: string;
+        answers: { questionId: string; answer: string }[];
+        currentNotes: string;
+        currentScore: string;
+      };
+    };
 
-  if (!applicationType) {
-    console.error(`Application type with ID "${applicationId}" not found.`);
+    if (!data) {
+      console.error(`Applicant submission with ID "${applicantSubmissionId}" not found for application type "${applicationId}".`);
+      return undefined;
+    }
+
+    return {
+      applicationName: data.applicationName,
+      applicationDescription: data.applicationDescription,
+      applicationQuestions: data.applicationQuestions,
+      applicantSubmission: data.applicantSubmission,
+    };
+  } catch (error) {
+    console.error("Error fetching individual applicant review data:", error);
     return undefined;
   }
-
-  const applicantSubmission = applicationType.submissions.find(sub => sub.id === applicantSubmissionId);
-
-  if (!applicantSubmission) {
-    console.error(`Applicant submission with ID "${applicantSubmissionId}" not found for application type "${applicationId}".`);
-    return undefined;
-  }
-
-  return {
-    applicationName: applicationType.name,
-    applicationTerm: applicationType.term,
-    applicationQuestions: applicationType.questions,
-    applicantSubmission,
-  };
 }

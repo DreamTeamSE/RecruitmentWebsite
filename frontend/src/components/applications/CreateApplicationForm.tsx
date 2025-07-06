@@ -106,7 +106,7 @@ const CreateApplicationForm: React.FC = () => {
     
     // More detailed validation
     const missingFields: string[] = [];
-    if (!formData.title.trim()) missingFields.push('Application Title');
+    if (!formData.title.trim()) missingFields.push('Form Title');
     if (!formData.description.trim()) missingFields.push('Description');
     if (!formData.staff_id.trim()) missingFields.push('Staff Selection');
     
@@ -170,10 +170,10 @@ const CreateApplicationForm: React.FC = () => {
         }
       }
 
-      console.log('Application form created successfully with ID:', newFormId);
+      console.log('Form created successfully with ID:', newFormId);
       
       // Show success message and redirect
-      alert(`Application form "${formData.title}" created successfully!`);
+      alert(`Form "${formData.title}" created successfully!`);
       
       // Redirect to the form review page
       window.location.href = `/applications-review/${newFormId}`;
@@ -193,14 +193,14 @@ const CreateApplicationForm: React.FC = () => {
         <div className="mb-6">
           <Link href="/applications-review" className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
             <ArrowLeft />
-            Back to Applications Review
+            Back to Forms Review
           </Link>
         </div>
         
         <div className="bg-white p-8 sm:p-12 rounded-xl shadow-lg border border-gray-200">
           <header className="border-b border-gray-200 pb-6 mb-8">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">Create New Application</h1>
-            <p className="text-xl text-gray-600 mt-2">Set up a new application for prospective candidates</p>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">Create New Form</h1>
+            <p className="text-xl text-gray-600 mt-2">Set up a new form for prospective candidates</p>
           </header>
           
           <form onSubmit={handleSubmit}>
@@ -211,7 +211,7 @@ const CreateApplicationForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                 <div>
                   <label htmlFor="title" className="block text-lg font-semibold text-gray-800 mb-2">
-                    Application Title *
+                    Form Title *
                   </label>
                   <input
                     type="text"
@@ -219,7 +219,7 @@ const CreateApplicationForm: React.FC = () => {
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    placeholder="e.g., Software Engineering Application, Design Team Application"
+                    placeholder="e.g., Software Engineering Form, Design Team Form"
                     required
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -235,7 +235,7 @@ const CreateApplicationForm: React.FC = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Describe what this application is for and what applicants can expect..."
+                  placeholder="Describe what this form is for and what applicants can expect..."
                   required
                   rows={4}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
@@ -245,7 +245,7 @@ const CreateApplicationForm: React.FC = () => {
 
             {/* Questions Section */}
             <div className="space-y-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Application Questions</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Form Questions</h2>
               
               {/* Existing Questions */}
               {formData.questions.length > 0 && (
@@ -389,7 +389,7 @@ const CreateApplicationForm: React.FC = () => {
                 disabled={isSubmitting}
                 className="bg-green-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-transform duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               >
-                {isSubmitting ? 'Creating Application...' : 'Create Application'}
+                {isSubmitting ? 'Creating Form...' : 'Create Form'}
               </button>
             </div>
           </form>

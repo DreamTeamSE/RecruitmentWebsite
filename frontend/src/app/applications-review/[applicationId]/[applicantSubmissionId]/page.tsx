@@ -10,9 +10,9 @@ import { getIndividualApplicantReviewDisplayData } from '@/lib/util/applicant.ut
 export default async function ApplicantReviewDetailPage({
   params,
 }: {
-  params: { applicationId: string; applicantSubmissionId: string };
+  params: Promise<{ applicationId: string; applicantSubmissionId: string }>;
 }) {
-  const { applicationId, applicantSubmissionId } = params;
+  const { applicationId, applicantSubmissionId } = await params;
 
   const reviewData = await getIndividualApplicantReviewDisplayData(applicationId, applicantSubmissionId);
 

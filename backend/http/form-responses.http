@@ -9,7 +9,8 @@ Content-Type: {{contentType}}
 
 {
   "applicant_id": "test-applicant-456",
-  "form_id": 1
+  "form_id": 1,
+  "applicant_email": "test.applicant@example.com"
 }
 
 ### 2. Create a question (with ordering)

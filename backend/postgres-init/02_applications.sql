@@ -20,6 +20,7 @@ CREATE TABLE FormEntries (
   id SERIAL PRIMARY KEY,
   applicant_id INTEGER NOT NULL REFERENCES Applicants(id),
   form_id INTEGER NOT NULL REFERENCES Forms(id),
+  applicant_email TEXT NOT NULL,
   submitted_at TIMESTAMP DEFAULT date_trunc('second', now()),
   UNIQUE (form_id, applicant_id)
 );

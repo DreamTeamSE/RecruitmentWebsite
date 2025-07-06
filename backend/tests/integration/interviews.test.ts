@@ -48,7 +48,8 @@ describe('Interview Integration Tests', () => {
       .post('/api/forms/entry/application')
       .send({
         applicant_id: applicantId,
-        form_id: formId
+        form_id: formId,
+        applicant_email: 'interview.test@example.com'
       });
     formEntryId = formEntryResponse.body.formEntry.id;
   });
@@ -186,7 +187,8 @@ describe('Interview Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: anotherApplicant.body.inserted_applicant.id,
-          form_id: formId
+          form_id: formId,
+          applicant_email: 'another.interview@example.com'
         });
 
       await request(app)
@@ -242,7 +244,8 @@ describe('Interview Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: applicantResponse.body.inserted_applicant.id,
-          form_id: secondFormId
+          form_id: secondFormId,
+          applicant_email: 'second.form@example.com'
         });
       secondFormEntryId = formEntryResponse.body.formEntry.id;
     });
@@ -300,7 +303,8 @@ describe('Interview Integration Tests', () => {
         .post('/api/forms/entry/application')
         .send({
           applicant_id: thirdApplicant.body.inserted_applicant.id,
-          form_id: secondFormId
+          form_id: secondFormId,
+          applicant_email: 'third.applicant@example.com'
         });
 
       const thirdInterviewEntry = await request(app)
