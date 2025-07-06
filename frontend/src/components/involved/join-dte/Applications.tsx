@@ -17,7 +17,6 @@ const FormApplicationCard: React.FC<ApplicationFormData> = ({ id, title, descrip
         <h3 className="text-base sm:text-lg font-semibold text-primary group-hover:underline mb-1">
           {title}
         </h3>
-        <p className="text-sm text-muted-foreground mb-2">{description}</p>
         <p className="text-sm text-muted-foreground">Created: {formattedDate}</p>
       </div>
     </Link>

@@ -105,11 +105,6 @@ const ReviewableApplicationCard: React.FC<ReviewableApplicationCardProps> = ({
         <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 mb-3 pr-12">
           {title}
         </h3>
-        <div className="bg-gray-50 rounded-md p-3 mb-4">
-          <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-            {description}
-          </p>
-        </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500">Created: {formattedDate}</span>
           <span className="text-sm font-medium text-blue-600 hover:text-blue-800">

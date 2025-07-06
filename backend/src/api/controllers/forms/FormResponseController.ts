@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertFormEntry, } from "../../../repositories/forms/FormEntryRepository";
+import { insertFormEntry } from "../../../repositories/forms/FormEntryRepository";
 import { insertQuestion, retrieveQuestions, deleteQuestion } from "../../../repositories/forms/QuestionEntryRepository";
 import { insertAnswer, retrieveAnswer } from "../../../repositories/forms/AnswerEntryRepository";
 // Questions
@@ -96,23 +96,25 @@ export const deleteQuestionById = async (req: Request, res: Response) => {
 };
 
 // Form
-export const createFormEntry = async (req: Request, res: Response) => {
+export const createFormEntry = async (req: Request, res: Response): Promise<void> => {
   try {
     const { applicant_id, form_id, applicant_email } = req.body;
     
     // Validate required fields
     if (!applicant_id || !form_id || !applicant_email) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: "Missing required fields: applicant_id, form_id, and applicant_email are required" 
       });
+      return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(applicant_email)) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: "Invalid email format" 
       });
+      return;
     }
 
     const form_entry = { applicant_id, form_id, applicant_email };

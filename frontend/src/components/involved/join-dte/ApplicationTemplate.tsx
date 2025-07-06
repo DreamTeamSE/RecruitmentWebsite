@@ -3,6 +3,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { filledApplicationData } from '@/lib/data/application/application';
 import { ApplicationQuestion } from '@/models/types/application';
 import { BACKEND_URL } from '@/lib/constants/string';
@@ -62,6 +63,7 @@ interface ApplicationTemplateProps {
 }
 
 const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState<{ firstName: string; lastName: string; email: string; [key: string]: string }>({
     firstName: '',
     lastName: '',
@@ -71,6 +73,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
   const [currentForm, setCurrentForm] = useState<ApplicationFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [apiQuestions, setApiQuestions] = useState<ApplicationQuestion[]>([]);
+  const [hasSubmittedLocally, setHasSubmittedLocally] = useState(false);
 
   // Load form data and find the specific form
   React.useEffect(() => {
@@ -169,8 +172,20 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Optional: Function to clear local submission flag (useful for testing)
+  const clearLocalSubmission = () => {
+    setHasSubmittedLocally(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if user has already submitted locally
+    if (hasSubmittedLocally) {
+      alert('You have already submitted an application for this form. Please navigate away and return to submit another application.');
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -229,7 +244,8 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       });
 
       if (!formEntryResponse.ok) {
-        throw new Error('Failed to create form entry');
+        const errorData = await formEntryResponse.json();
+        throw new Error(errorData.message || 'Failed to create form entry');
       }
 
       const formEntryResult = await formEntryResponse.json();
@@ -322,8 +338,8 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       console.log("Created Applicant:", applicantResult.inserted_applicant);
       console.log("Created Form Entry:", formEntryResult.formEntry);
       
-      // Redirect to Thank You page after successful submission
-      window.location.href = '/get-involved/join-dte/thank-you';
+      // Mark as submitted for this page visit only (no persistence)
+      setHasSubmittedLocally(true);
       
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -379,9 +395,6 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
             {displayData.term && (
               <p className="text-xl text-gray-600 mt-2">{displayData.term}</p>
             )}
-            <p className="mt-4 text-gray-800 leading-relaxed">
-              {currentForm ? currentForm.description : displayData.description}
-            </p>
             {displayData.deadline && (
               <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 text-blue-800 rounded-r-lg">
                 <p><span className="font-bold">Application Deadline:</span> {displayData.deadline}</p>
@@ -457,11 +470,19 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
             <div className="mt-8 text-center">
               <button 
                 type="submit" 
-                disabled={isSubmitting}
+                disabled={isSubmitting || hasSubmittedLocally}
                 className="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-transform duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                {isSubmitting ? 'Submitting...' : hasSubmittedLocally ? 'Application Already Submitted' : 'Submit Application'}
               </button>
+              {hasSubmittedLocally && (
+                <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-400 text-green-800 rounded-r-lg">
+                  <p className="text-sm">
+                    ✅ You have already submitted an application for this form. 
+                    Thank you for your submission! Navigate back to the applications page and return here to submit again if needed.
+                  </p>
+                </div>
+              )}
             </div>
           </form>
         </div>
