@@ -7,7 +7,7 @@ const isLocal = process.env.NODE_ENV !== 'production';
 
 const psql_client = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ...(isLocal && { ssl: false }),
+  ...(isLocal ? { ssl: false } : { ssl: { rejectUnauthorized: false } }),
 });
 
 

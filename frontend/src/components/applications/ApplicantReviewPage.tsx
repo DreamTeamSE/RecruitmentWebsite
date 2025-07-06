@@ -59,7 +59,7 @@ export default function IndividualApplicantReviewDisplay({ reviewData }: Individ
     setSaveMessage('');
     
     try {
-      const response = await axios.post(`http://localhost:3000/api/forms/entries/${applicantSubmission.id}/review`, {
+      const response = await axios.post(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/entries/${applicantSubmission.id}/review`, {
         notes: notes.trim() || undefined,
         score: score.trim() || undefined
       });

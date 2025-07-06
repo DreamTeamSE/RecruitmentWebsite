@@ -9,7 +9,7 @@ export async function getIndividualApplicantReviewDisplayData(
   applicantSubmissionId: string
 ): Promise<IndividualReviewPageDisplayData | undefined> {
   try {
-    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
+    const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
     const data = response.data as {
       applicationName: string;
       applicationDescription: string;

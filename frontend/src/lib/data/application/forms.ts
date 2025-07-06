@@ -110,7 +110,7 @@ export const formFeedData: ApplicationFormData[] = [
 // Helper function to fetch forms from the API
 export async function fetchForms(): Promise<ApplicationFormData[]> {
   try {
-    const response = await fetch('http://localhost:3000/api/forms/feed');
+    const response = await fetch('http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/feed');
     const data = await response.json();
     return data.feed;
   } catch (error) {

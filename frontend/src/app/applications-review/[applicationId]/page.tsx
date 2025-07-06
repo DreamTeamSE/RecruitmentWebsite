@@ -10,7 +10,7 @@ async function getApplicationReviewData(applicationId: string): Promise<{
   applicationName: string;
 } | null> {
   try {
-    const response = await fetch(`http://localhost:3000/api/forms/${applicationId}/entries`);
+    const response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries`);
     const data = await response.json();
 
     return {
@@ -25,7 +25,7 @@ async function getApplicationReviewData(applicationId: string): Promise<{
 // Generate static paths for each application ID
 export async function generateStaticParams() {
   try {
-    const response = await fetch('http://localhost:3000/api/forms/feed');
+    const response = await fetch('http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/feed');
     const data = await response.json();
     return data.feed.map((form: { id: number }) => ({
       applicationId: form.id.toString(),

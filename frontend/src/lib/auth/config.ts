@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Call our backend API to authenticate the staff member
-          const response = await fetch(`http://localhost:3000/api/auth/login`, {
+          const response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

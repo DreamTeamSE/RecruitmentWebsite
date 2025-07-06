@@ -372,7 +372,7 @@ export async function getIndividualApplicantReviewDisplayData(
   applicantSubmissionId: string
 ): Promise<IndividualReviewPageDisplayData | undefined> {
   try {
-    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
+    const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
     const data = response.data as {
       applicationName: string;
       applicationDescription: string;
@@ -408,7 +408,7 @@ export async function getIndividualApplicantReviewDisplayData(
 
 export async function fetchApplicationData(applicationId: string) {
   try {
-    const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries`);
+    const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries`);
     return (response.data as { entries: Record<string, unknown>[] }).entries;
   } catch (error) {
     console.error("Error fetching application data:", error);
