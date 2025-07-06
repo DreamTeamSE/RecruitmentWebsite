@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { Button } from "@/components/ui/button"; // Assuming this uses the buttonVariants from the Canvas
 import { Menu, X, ChevronDown, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
 import UserMenu from '@/components/auth/UserMenu';
+import type { AuthenticatedUser } from '@/models/types/auth';
 
 interface NavSubLinkItem {
   href: string;
@@ -65,7 +66,7 @@ export default function Navbar() {
   // Filter nav links based on authentication status
   const navLinks = baseNavLinks.filter(link => {
     if (link.requiresAuth) {
-      return status === "authenticated" && session?.user?.emailVerified;
+      return status === 'authenticated' && (session?.user as AuthenticatedUser)?.emailVerified;
     }
     return true;
   });

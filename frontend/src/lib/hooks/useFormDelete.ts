@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BACKEND_URL } from '@/lib/constants/string';
+import { getBackendUrl } from '@/lib/constants/string';
 
 interface UseFormDeleteOptions {
   onSuccess?: () => void;
@@ -27,7 +27,7 @@ export const useFormDelete = (options: UseFormDeleteOptions = {}) => {
   const deleteForm = async (formId: number) => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`http://${BACKEND_URL}/api/forms/${formId}`, {
+      const response = await fetch(`${getBackendUrl()}/api/forms/${formId}`, {
         method: 'DELETE',
       });
 

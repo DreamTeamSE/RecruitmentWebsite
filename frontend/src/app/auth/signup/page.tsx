@@ -4,6 +4,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { getBackendUrl } from '@/lib/constants/string'
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/register`, {
+      const response = await fetch(`${getBackendUrl()}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,7 +1,8 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
-import Link from "next/link"
+import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
+import type { AuthenticatedUser } from '@/models/types/auth';
 import { useState } from "react"
 
 export default function UserMenu() {
@@ -53,7 +54,7 @@ export default function UserMenu() {
           <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
             <div className="font-medium">{session?.user?.name}</div>
             <div className="text-gray-500">{session?.user?.email}</div>
-            <div className="text-xs text-blue-600 capitalize">{session?.user?.role}</div>
+            <div className="text-xs text-blue-600 capitalize">{(session?.user as AuthenticatedUser)?.role}</div>
           </div>
           
           <Link

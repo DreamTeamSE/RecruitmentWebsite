@@ -1,7 +1,8 @@
-"use client"
+'use client';
 
-import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import type { AuthenticatedUser } from '@/models/types/auth';
 
 export default function UserDashboard() {
   const { data: session, status } = useSession()
@@ -35,8 +36,8 @@ export default function UserDashboard() {
               <div className="space-y-2">
                 <p><span className="font-medium">Name:</span> {session?.user?.name}</p>
                 <p><span className="font-medium">Email:</span> {session?.user?.email}</p>
-                <p><span className="font-medium">Role:</span> {session?.user?.role}</p>
-                <p><span className="font-medium">Email Verified:</span> {session?.user?.emailVerified ? "Yes" : "No"}</p>
+                <p><span className="font-medium">Role:</span> {(session?.user as AuthenticatedUser)?.role}</p>
+                <p><span className="font-medium">Email Verified:</span> {(session?.user as AuthenticatedUser)?.emailVerified ? 'Yes' : 'No'}</p>
               </div>
             </div>
             

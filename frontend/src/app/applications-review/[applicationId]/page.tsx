@@ -4,13 +4,14 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import ApplicationReviewClientPage from '@/components/applications/ApplicationReviewPage';
+import { getBackendUrl } from '@/lib/constants/string';
 
 // Fetch application review data from API
 async function getApplicationReviewData(applicationId: string): Promise<{
   applicationName: string;
 } | null> {
   try {
-    const response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries`);
+    const response = await fetch(`${getBackendUrl()}/api/forms/${applicationId}/entries`);
     const data = await response.json();
 
     return {
@@ -25,7 +26,7 @@ async function getApplicationReviewData(applicationId: string): Promise<{
 // Generate static paths for each application ID
 export async function generateStaticParams() {
   try {
-    const response = await fetch('http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/feed');
+    const response = await fetch(`${getBackendUrl()}/api/forms/feed`);
     const data = await response.json();
     return data.feed.map((form: { id: number }) => ({
       applicationId: form.id.toString(),

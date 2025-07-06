@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { filledApplicationData } from '@/lib/data/application/application';
 import { ApplicationQuestion } from '@/models/types/application';
-import { BACKEND_URL } from '@/lib/constants/string';
+import { getBackendUrl } from '@/lib/constants/string';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
 
 const ArrowLeft = () => (
@@ -62,16 +62,14 @@ interface ApplicationTemplateProps {
 }
 
 const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId }) => {
-  const [formData, setFormData] = useState<{ firstName: string; lastName: string; email: string; [key: string]: string }>({
+  const [formData, setFormData] = useState<{ firstName: string; lastName: string; [key: string]: string }>({
     firstName: '',
     lastName: '',
-    email: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentForm, setCurrentForm] = useState<ApplicationFormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [apiQuestions, setApiQuestions] = useState<ApplicationQuestion[]>([]);
-  const [hasSubmittedLocally, setHasSubmittedLocally] = useState(false);
 
   // Load form data and find the specific form
   React.useEffect(() => {
@@ -83,17 +81,16 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
         
         // If we found a form, also fetch its questions
         if (form) {
-          const questionsResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question?form_id=${form.id}`);
+          const questionsResponse = await fetch(`${getBackendUrl()}/api/forms/entry/question?form_id=${form.id}`);
           if (questionsResponse.ok) {
             const questionsResult = await questionsResponse.json();
-            const fetchedQuestions = (questionsResult.question || []).map((q: { id: number; question_text: string; question_type: string; question_order: number }) => ({
-              id: q.id.toString(), // Use actual database ID
+            const fetchedQuestions = (questionsResult.question || []).map((q: { id?: number; question_order: number; question_text: string; question_type: string }) => ({
+              id: `question-${q.question_order}`,
               questionText: q.question_text,
               type: q.question_type === 'text' ? 'text' : 'textarea',
               required: true,
               placeholder: `Enter your answer for question ${q.question_order}...`,
-              order: q.question_order,
-              dbId: q.id // Store database ID
+              order: q.question_order
             }));
             setApiQuestions(fetchedQuestions);
           }
@@ -172,33 +169,11 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check if user has already submitted locally
-    if (hasSubmittedLocally) {
-      alert('You have already submitted an application for this form. Please navigate away and return to submit another application.');
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
-      // Validation
-      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
-        alert('Please fill in all required fields: First Name, Last Name, and Email Address.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        alert('Please enter a valid email address.');
-        setIsSubmitting(false);
-        return;
-      }
-
       // Step 1: Create the applicant
-      const applicantResponse = await fetch(`http://${BACKEND_URL}/api/applicant/create`, {
+      const applicantResponse = await fetch(`${getBackendUrl()}/api/applicant/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,7 +199,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       }
 
       // Step 2: Create form entry
-      const formEntryResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/application`, {
+      const formEntryResponse = await fetch(`${getBackendUrl()}/api/forms/entry/application`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -232,13 +207,11 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
         body: JSON.stringify({
           applicant_id: applicant_id,
           form_id: form_id,
-          applicant_email: formData.email, // Email is now required
         }),
       });
 
       if (!formEntryResponse.ok) {
-        const errorData = await formEntryResponse.json();
-        throw new Error(errorData.message || 'Failed to create form entry');
+        throw new Error('Failed to create form entry');
       }
 
       const formEntryResult = await formEntryResponse.json();
@@ -247,8 +220,8 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       const form_entry_id = formEntryResult.formEntry.id;
 
       // Step 3: Get existing questions for this form or create them
-      const questionsResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question?form_id=${form_id}`);
-      let existingQuestions: { id: number; question_order: number }[] = [];
+      const questionsResponse = await fetch(`${getBackendUrl()}/api/forms/entry/question?form_id=${form_id}`);
+      let existingQuestions: { id?: number; question_order: number; question_text: string; question_type: string }[] = [];
       
       if (questionsResponse.ok) {
         const questionsResult = await questionsResponse.json();
@@ -275,7 +248,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           if (!questionRecord) {
             // Create the question if it doesn't exist
             try {
-              const createQuestionResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question`, {
+              const createQuestionResponse = await fetch(`${getBackendUrl()}/api/forms/entry/question`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -303,7 +276,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           }
 
           // Submit the answer using the question's database ID
-          const answerResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/answer/text`, {
+          const answerResponse = await fetch(`${getBackendUrl()}/api/forms/entry/answer/text`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -312,7 +285,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
               answer_type: "text",
               applicant_id: applicant_id,
               form_entry_id: form_entry_id,
-              question_id: questionRecord.id,
+              question_id: questionRecord?.id,
               answer_text: answer_text,
             }),
           });
@@ -331,8 +304,8 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       console.log("Created Applicant:", applicantResult.inserted_applicant);
       console.log("Created Form Entry:", formEntryResult.formEntry);
       
-      // Mark as submitted for this page visit only (no persistence)
-      setHasSubmittedLocally(true);
+      // Return the inserted_applicant as requested
+      return applicantResult.inserted_applicant;
       
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -388,6 +361,9 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
             {displayData.term && (
               <p className="text-xl text-gray-600 mt-2">{displayData.term}</p>
             )}
+            <p className="mt-4 text-gray-800 leading-relaxed">
+              {currentForm ? currentForm.description : displayData.description}
+            </p>
             {displayData.deadline && (
               <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 text-blue-800 rounded-r-lg">
                 <p><span className="font-bold">Application Deadline:</span> {displayData.deadline}</p>
@@ -431,21 +407,6 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
                   />
                 </div>
               </div>
-              <div className="mt-4">
-                <label htmlFor="email" className="block text-lg font-semibold text-gray-800 mb-2">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your email address"
-                />
-              </div>
             </div>
 
             {/* Application Questions Section */}
@@ -463,19 +424,11 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
             <div className="mt-8 text-center">
               <button 
                 type="submit" 
-                disabled={isSubmitting || hasSubmittedLocally}
+                disabled={isSubmitting}
                 className="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-transform duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                {isSubmitting ? 'Submitting...' : hasSubmittedLocally ? 'Application Already Submitted' : 'Submit Application'}
+                {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
-              {hasSubmittedLocally && (
-                <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-400 text-green-800 rounded-r-lg">
-                  <p className="text-sm">
-                    ✅ You have already submitted an application for this form. 
-                    Thank you for your submission! Navigate back to the applications page and return here to submit again if needed.
-                  </p>
-                </div>
-              )}
             </div>
           </form>
         </div>

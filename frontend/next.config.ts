@@ -1,14 +1,44 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Enable strict TypeScript and ESLint checking during build
   typescript: {
-    // Temporarily ignore TypeScript errors during build
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // Temporarily ignore ESLint errors during build
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
+  },
+  
+  // Performance optimizations
+  poweredByHeader: false,
+  
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
+  },
+  
+  // Optimize images
+  images: {
+    domains: [],
+    formats: ['image/avif', 'image/webp'],
   },
 };
 

@@ -1,7 +1,8 @@
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { getBackendUrl } from '@/lib/constants/string';
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: any = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -28,7 +29,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Call our backend API to authenticate the staff member
-          const response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
+          const response = await fetch(`${getBackendUrl()}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -69,18 +70,18 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user) {
-        token.role = user.role
-        token.emailVerified = Boolean(user.emailVerified)
+        token.role = (user as any).role;
+        token.emailVerified = Boolean((user as any).emailVerified);
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (token) {
-        session.user.id = token.sub!
-        session.user.role = token.role as string
-        session.user.emailVerified = Boolean(token.emailVerified)
+        (session.user as any).id = token.sub!;
+        (session.user as any).role = token.role as string;
+        (session.user as any).emailVerified = Boolean(token.emailVerified);
       }
       return session
     },

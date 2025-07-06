@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { getBackendUrl } from '@/lib/constants/string';
 import axios from 'axios';
 // Assuming types are in a shared file, adjust path if they are defined elsewhere
 // These types should match those defined in your data source (e.g., applicantReviewDetailData.ts)
@@ -11,7 +12,7 @@ import type { IndividualApplicantReviewDisplayProps } from '@/models/types/appli
 
 
 export default function IndividualApplicantReviewDisplay({ reviewData }: IndividualApplicantReviewDisplayProps) {
-  const { applicationName, applicationDescription, applicantSubmission, applicationQuestions } = reviewData;
+  const { applicationName, applicantSubmission, applicationQuestions } = reviewData;
 
   // State for reviewer's notes and score
   const [notes, setNotes] = useState(applicantSubmission.currentNotes || '');
@@ -59,7 +60,7 @@ export default function IndividualApplicantReviewDisplay({ reviewData }: Individ
     setSaveMessage('');
     
     try {
-      const response = await axios.post(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/entries/${applicantSubmission.id}/review`, {
+      const response = await axios.post(`${getBackendUrl()}/api/forms/entries/${applicantSubmission.id}/review`, {
         notes: notes.trim() || undefined,
         score: score.trim() || undefined
       });
@@ -92,18 +93,6 @@ export default function IndividualApplicantReviewDisplay({ reviewData }: Individ
               {applicationName}
             </h1>
             
-            {/* Position Description */}
-            {applicationDescription && (
-              <div className="max-w-4xl mx-auto">
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <div className="flex items-center justify-center mb-3">
-                  </div>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                    {applicationDescription}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

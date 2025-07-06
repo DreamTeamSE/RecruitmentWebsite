@@ -46,7 +46,7 @@ export default function AuthGuard({
   }
 
   // Don't render children if authentication is required but user is not authenticated
-  if (requireAuth && (status === "unauthenticated" || (session && session.user && !(session.user as any).emailVerified))) {
+  if (requireAuth && (status === "unauthenticated" || (session && session.user && !('emailVerified' in session.user && session.user.emailVerified)))) {
     return null
   }
 

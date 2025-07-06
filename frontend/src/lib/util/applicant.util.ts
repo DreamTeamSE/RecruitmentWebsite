@@ -1,6 +1,7 @@
 // src/lib/util/applicant.util.ts
 
-import { IndividualReviewPageDisplayData } from '@/models/types/application';
+import { IndividualReviewPageDisplayData, ApplicationQuestion } from '@/models/types/application';
+import { getBackendUrl } from '@/lib/constants/string';
 import axios from 'axios';
 
 // ✅ Mark function async
@@ -9,7 +10,7 @@ export async function getIndividualApplicantReviewDisplayData(
   applicantSubmissionId: string
 ): Promise<IndividualReviewPageDisplayData | undefined> {
   try {
-    const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
+    const response = await axios.get(`${getBackendUrl()}/api/forms/${applicationId}/entries/${applicantSubmissionId}`);
     const data = response.data as {
       applicationName: string;
       applicationDescription: string;
@@ -33,8 +34,8 @@ export async function getIndividualApplicantReviewDisplayData(
 
     return {
       applicationName: data.applicationName,
-      applicationDescription: data.applicationDescription,
-      applicationQuestions: data.applicationQuestions,
+      applicationTerm: '',
+      applicationQuestions: data.applicationQuestions as unknown as ApplicationQuestion[],
       applicantSubmission: data.applicantSubmission,
     };
   } catch (error) {

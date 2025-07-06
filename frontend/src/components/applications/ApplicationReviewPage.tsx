@@ -3,11 +3,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Edit } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Applicant } from '@/models/types/application';
 import axios from 'axios';
-import { BACKEND_URL } from '@/lib/constants/string';
+import { getBackendUrl } from '@/lib/constants/string';
 
 // Define the structure for an individual applicant
 const ApplicantCard: React.FC<Applicant> = ({ name, appliedDate, score, applicationLink }) => {
@@ -66,7 +66,7 @@ export default function ApplicationReviewClientPage({
     setMounted(true); // Ensure client-side specific logic runs after mount
     async function fetchApplicants() {
       try {
-        const response = await axios.get<FormEntriesResponse>(`http://${BACKEND_URL}/api/forms/${applicationId}/entries`);
+        const response = await axios.get<FormEntriesResponse>(`${getBackendUrl()}/api/forms/${applicationId}/entries`);
         
         // Map the backend response to the frontend Applicant format
         const mappedApplicants: Applicant[] = response.data.entries.map((entry) => ({
@@ -123,15 +123,6 @@ export default function ApplicationReviewClientPage({
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground font-serif">
             {applicationName}
           </h1>
-          {/* Edit button positioned absolutely in top right */}
-          <Link 
-            href={`/applications-review/${applicationId}/edit`}
-            className="absolute top-0 right-0 flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-            title="Edit application form"
-          >
-            <Edit className="h-4 w-4" />
-            <span className="hidden sm:inline">Edit Form</span>
-          </Link>
         </div>
 
         <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row items-center justify-center gap-4 sticky top-0 bg-[#F3F4F9]/80 backdrop-blur-md py-4 z-10">

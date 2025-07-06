@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ApplicationQuestion } from '@/models/types/application';
-import { BACKEND_URL } from '@/lib/constants/string';
+import { getBackendUrl } from '@/lib/constants/string';
 import { useSession } from "next-auth/react";
 
 const ArrowLeft = () => (
@@ -118,7 +118,7 @@ const CreateApplicationForm: React.FC = () => {
     
     try {
       // Create the form first
-      const createFormResponse = await fetch(`http://${BACKEND_URL}/api/forms/application`, {
+      const createFormResponse = await fetch(`${getBackendUrl()}/api/forms/application`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ const CreateApplicationForm: React.FC = () => {
         for (let i = 0; i < formData.questions.length; i++) {
           const question = formData.questions[i];
           
-          const createQuestionResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question`, {
+          const createQuestionResponse = await fetch(`${getBackendUrl()}/api/forms/entry/question`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

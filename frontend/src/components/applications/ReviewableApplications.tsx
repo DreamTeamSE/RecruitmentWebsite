@@ -3,27 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
-import { BACKEND_URL } from '@/lib/constants/string';
+import { getBackendUrl } from '@/lib/constants/string';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
-// Edit icon component
-const EditIcon = () => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="16" 
-    height="16" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    className="h-4 w-4"
-  >
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-  </svg>
-);
 
 // Trash icon component
 const TrashIcon = () => (
@@ -75,15 +57,6 @@ const ReviewableApplicationCard: React.FC<ReviewableApplicationCardProps> = ({
     <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 relative group">
       {/* Action buttons - positioned absolutely in top right */}
       <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <Link 
-          href={`/applications-review/${id}/edit`} 
-          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-          onClick={(e) => e.stopPropagation()}
-          title="Edit application form"
-        >
-          <EditIcon />
-        </Link>
-        
         <button
           onClick={handleDelete}
           disabled={isDeleting}
@@ -165,7 +138,7 @@ export default function ReviewableApplications() {
   const handleDeleteForm = async (formId: number) => {
     setDeletingFormId(formId);
     try {
-      const response = await fetch(`http://${BACKEND_URL}/api/forms/${formId}`, {
+      const response = await fetch(`${getBackendUrl()}/api/forms/${formId}`, {
         method: 'DELETE',
       });
 
