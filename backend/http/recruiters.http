@@ -3,26 +3,12 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 
-### 1. Get all recruiters
-GET {{baseUrl}}/api/recruiter
-Content-Type: {{contentType}}
-
-### 2. Create a new recruiter
+### 1. Create a new recruiter
 POST {{baseUrl}}/api/recruiter/create
 Content-Type: {{contentType}}
 
 {
-  "uuid": "recruiter-uuid-123",
+  "uuid": "recruiter-uuid-1234",
   "first_name": "John",
   "last_name": "Doe"
-}
-
-### 3. Create another recruiter for testing
-POST {{baseUrl}}/api/recruiter/create
-Content-Type: {{contentType}}
-
-{
-  "uuid": "recruiter-uuid-456",
-  "first_name": "Jane",
-  "last_name": "Smith"
 }
