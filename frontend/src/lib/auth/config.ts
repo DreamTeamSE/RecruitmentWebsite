@@ -5,10 +5,10 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 // Debug logging for environment variables
 console.log('=== NextAuth Environment Debug ===');
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('APP_ENV:', process.env.APP_ENV);
-console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
-console.log('NEXTAUTH_SECRET exists:', !!process.env.NEXTAUTH_SECRET);
-console.log('NEXTAUTH_SECRET length:', process.env.NEXTAUTH_SECRET?.length || 0);
+console.log('APP_ENV:', process.env.APP_ENV || process.env.NEXT_PUBLIC_APP_ENV);
+console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_NEXTAUTH_URL);
+console.log('NEXTAUTH_SECRET exists:', !!(process.env.NEXTAUTH_SECRET || process.env.NEXT_PUBLIC_NEXTAUTH_SECRET));
+console.log('NEXTAUTH_SECRET length:', (process.env.NEXTAUTH_SECRET || process.env.NEXT_PUBLIC_NEXTAUTH_SECRET)?.length || 0);
 console.log('NEXT_PUBLIC_BACKEND_URL:', process.env.NEXT_PUBLIC_BACKEND_URL);
 console.log('=== End Debug ===');
 
@@ -127,5 +127,5 @@ export const authOptions: any = {
     signIn: "/auth/signin",
     verifyRequest: "/auth/verify-request",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
 }
