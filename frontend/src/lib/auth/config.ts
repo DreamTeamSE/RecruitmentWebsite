@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { getBackendUrl } from '@/lib/constants/string';
+// import { getBackendUrl } from '@/lib/constants/string';
 
 export const authOptions: any = {
   providers: [
@@ -29,7 +29,8 @@ export const authOptions: any = {
 
         try {
           // Call our backend API to authenticate the staff member
-          const response = await fetch(`${getBackendUrl()}/api/auth/login`, {
+          const backendUrl = 'https://d2oc9fk5wyihzt.cloudfront.net';
+          const response = await fetch(`${backendUrl}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
