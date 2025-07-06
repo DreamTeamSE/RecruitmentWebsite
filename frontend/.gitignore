@@ -4,34 +4,47 @@
 /node_modules
 /.pnp
 .pnp.*
+.pnpm-store
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+!.yarnrc.yml
 
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# next.js build output
+/.next
+/out
 
 # production
 /build
+/dist
+
+# AWS Amplify
+/amplify/#current-cloud-backend
+amplify/.config
+amplify/backend/.temp
+amplify/#build
 
 # misc
 .DS_Store
 *.pem
 
-# debug
+# log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (optional — remove this line if you want to commit env files)
 .env*
+.env.local
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
@@ -39,3 +52,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# system files
+Thumbs.db
+.idea/
+.vscode/
+*.swp
