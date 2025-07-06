@@ -21,7 +21,14 @@ export const getBackendUrl = (): string => {
     baseUrl = 'localhost:3000';
   }
   
-  return baseUrl.startsWith('http') ? baseUrl : `http://${baseUrl}`;
+  // Use HTTPS for production, HTTP for localhost
+  if (baseUrl.startsWith('http')) {
+    return baseUrl;
+  } else if (baseUrl.includes('localhost')) {
+    return `http://${baseUrl}`;
+  } else {
+    return `https://${baseUrl}`;
+  }
 };
 
 // Note: We now use form IDs directly from the API feed
