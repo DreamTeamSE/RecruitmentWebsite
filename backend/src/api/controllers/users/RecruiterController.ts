@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { insertStaff, getAllRecruiters } from "../../../repositories/user/StaffRepository";
+import { insertStaff, getAllRecruiters, deleteStaffByEmail } from "../../../repositories/user/StaffRepository";
 
 export const createRecruiter = async (req: Request, res: Response) => {
     try {
@@ -28,5 +28,26 @@ export const getRecruiters = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error fetching recruiters:", (error as Error).message);
         res.status(500).json({ message: "Failed to fetch recruiters", error: (error as Error).message });
+    }
+};
+
+export const deleteStaffByEmailController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email } = req.params;
+        if (!email) {
+            res.status(400).json({ message: "Email parameter is required" });
+            return;
+        }
+        
+        const deleted = await deleteStaffByEmail(email);
+        if (deleted) {
+            console.log("Staff member deleted successfully:", email);
+            res.status(200).json({ message: "Staff member deleted successfully", email });
+        } else {
+            res.status(404).json({ message: "Staff member not found", email });
+        }
+    } catch (error) {
+        console.error("Error deleting staff member:", (error as Error).message);
+        res.status(500).json({ message: "Failed to delete staff member", error: (error as Error).message });
     }
 };

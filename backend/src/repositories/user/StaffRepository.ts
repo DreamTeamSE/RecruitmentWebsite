@@ -202,6 +202,25 @@ const insertStaff = async (
     }
 };
 
+const deleteStaffByEmail = async (email: string): Promise<boolean> => {
+    const client = await psql_client.connect();
+    try {
+        const query = `
+            DELETE FROM staff 
+            WHERE email = $1
+            RETURNING id;
+        `;
+        
+        const result: QueryResult = await client.query(query, [email.toLowerCase()]);
+        return result.rowCount !== null && result.rowCount > 0;
+    } catch (error) {
+        console.error('Error deleting staff by email:', error);
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
 export { 
     createStaff, 
     findStaffByEmail, 
@@ -210,5 +229,6 @@ export {
     validateStaffPassword,
     getAllStaff,
     getAllRecruiters,
-    insertStaff
+    insertStaff,
+    deleteStaffByEmail
 };
