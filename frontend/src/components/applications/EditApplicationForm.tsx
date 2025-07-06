@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ApplicationQuestion } from '@/models/types/application';
-import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
+import { fetchForms } from '@/lib/data/application/forms';
 import { BACKEND_URL } from '@/lib/constants/string';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
@@ -74,7 +74,7 @@ const EditApplicationForm: React.FC<EditApplicationFormProps> = ({ applicationId
           
           if (questionsResponse.ok) {
             const questionsResult = await questionsResponse.json();
-            existingQuestions = (questionsResult.question || []).map((q: any) => ({
+            existingQuestions = (questionsResult.question || []).map((q: { id: number; question_text: string; question_type: string; question_order: number }) => ({
               id: q.id.toString(), // Use the actual database ID
               questionText: q.question_text,
               type: q.question_type === 'text' ? 'text' : 'textarea',

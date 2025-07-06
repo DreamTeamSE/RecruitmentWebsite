@@ -409,7 +409,7 @@ export async function getIndividualApplicantReviewDisplayData(
 export async function fetchApplicationData(applicationId: string) {
   try {
     const response = await axios.get(`http://localhost:3000/api/forms/${applicationId}/entries`);
-    return (response.data as { entries: any[] }).entries;
+    return (response.data as { entries: Record<string, unknown>[] }).entries;
   } catch (error) {
     console.error("Error fetching application data:", error);
     return [];

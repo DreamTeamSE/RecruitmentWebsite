@@ -3,7 +3,6 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { filledApplicationData } from '@/lib/data/application/application';
 import { ApplicationQuestion } from '@/models/types/application';
 import { BACKEND_URL } from '@/lib/constants/string';
@@ -63,7 +62,6 @@ interface ApplicationTemplateProps {
 }
 
 const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId }) => {
-  const router = useRouter();
   const [formData, setFormData] = useState<{ firstName: string; lastName: string; email: string; [key: string]: string }>({
     firstName: '',
     lastName: '',
@@ -88,7 +86,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           const questionsResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question?form_id=${form.id}`);
           if (questionsResponse.ok) {
             const questionsResult = await questionsResponse.json();
-            const fetchedQuestions = (questionsResult.question || []).map((q: any) => ({
+            const fetchedQuestions = (questionsResult.question || []).map((q: { id: number; question_text: string; question_type: string; question_order: number }) => ({
               id: q.id.toString(), // Use actual database ID
               questionText: q.question_text,
               type: q.question_type === 'text' ? 'text' : 'textarea',
@@ -172,11 +170,6 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Optional: Function to clear local submission flag (useful for testing)
-  const clearLocalSubmission = () => {
-    setHasSubmittedLocally(false);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -255,7 +248,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
 
       // Step 3: Get existing questions for this form or create them
       const questionsResponse = await fetch(`http://${BACKEND_URL}/api/forms/entry/question?form_id=${form_id}`);
-      let existingQuestions: any[] = [];
+      let existingQuestions: { id: number; question_order: number }[] = [];
       
       if (questionsResponse.ok) {
         const questionsResult = await questionsResponse.json();

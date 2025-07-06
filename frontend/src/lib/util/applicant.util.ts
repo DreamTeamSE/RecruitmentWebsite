@@ -13,7 +13,7 @@ export async function getIndividualApplicantReviewDisplayData(
     const data = response.data as {
       applicationName: string;
       applicationDescription: string;
-      applicationQuestions: any[];
+      applicationQuestions: Record<string, unknown>[];
       applicantSubmission: {
         id: string;
         firstName: string;

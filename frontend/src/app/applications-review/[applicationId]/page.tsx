@@ -4,7 +4,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import ApplicationReviewClientPage from '@/components/applications/ApplicationReviewPage';
-import { Applicant } from '@/models/types/application';
 
 // Fetch application review data from API
 async function getApplicationReviewData(applicationId: string): Promise<{
@@ -28,19 +27,19 @@ export async function generateStaticParams() {
   try {
     const response = await fetch('http://localhost:3000/api/forms/feed');
     const data = await response.json();
-    return data.feed.map((form: any) => ({
+    return data.feed.map((form: { id: number }) => ({
       applicationId: form.id.toString(),
     }));
-  } catch (error) {
+  } catch {
     // Return empty array if API is not available
     return [];
   }
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     applicationId: string;
-  };
+  }>;
 }
 
 // Server Component Page

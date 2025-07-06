@@ -1,12 +1,12 @@
 import { withAuth } from "next-auth/middleware"
 
 export default withAuth(
-  function middleware(req) {
+  function middleware() {
     // Add any additional middleware logic here
   },
   {
     callbacks: {
-      authorized: ({ token, req }) => {
+      authorized: ({ token }) => {
         // Check if user has a valid token
         if (!token) return false
         

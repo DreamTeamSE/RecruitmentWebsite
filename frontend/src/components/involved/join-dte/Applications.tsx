@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
 
-const FormApplicationCard: React.FC<ApplicationFormData> = ({ id, title, description, created_at }) => {
+const FormApplicationCard: React.FC<ApplicationFormData> = ({ id, title, created_at }) => {
   const formattedDate = new Date(created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -45,10 +45,6 @@ export default function ApplicationsSection() {
     loadForms();
   }, []);
 
-  const handleCardClick = (formId: number) => {
-    window.location.href = `/get-involved/join-dte/${formId}`;
-  };
-
   if (isLoading) {
     return (
       <section className="py-16 sm:py-24 bg-[#F3F4F9]">
@@ -87,17 +83,7 @@ export default function ApplicationsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {forms.map((form) => (
-            <button
-              key={form.id}
-              onClick={() => handleCardClick(form.id)}
-              className="block group bg-background p-4 sm:p-6 rounded-[var(--radius)] shadow-md hover:shadow-lg transition-shadow duration-300"
-            >
-              <h3 className="text-base sm:text-lg font-semibold text-primary group-hover:underline mb-1">
-                {form.title}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-2">{form.description}</p>
-              <p className="text-sm text-muted-foreground">Created: {new Date(form.created_at).toLocaleDateString()}</p>
-            </button>
+            <FormApplicationCard key={form.id} {...form} />
           ))}
         </div>
 

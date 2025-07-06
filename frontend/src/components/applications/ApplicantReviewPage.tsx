@@ -10,7 +10,7 @@ import type { IndividualApplicantReviewDisplayProps } from '@/models/types/appli
 
 
 
-export default function IndividualApplicantReviewDisplay({ reviewData, applicationTypeId }: IndividualApplicantReviewDisplayProps) {
+export default function IndividualApplicantReviewDisplay({ reviewData }: IndividualApplicantReviewDisplayProps) {
   const { applicationName, applicationDescription, applicantSubmission, applicationQuestions } = reviewData;
 
   // State for reviewer's notes and score

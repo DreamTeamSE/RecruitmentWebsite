@@ -1,7 +1,8 @@
 "use client"
 
+  "use client"
+
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 export default function SignUp() {
@@ -15,7 +16,6 @@ export default function SignUp() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -87,7 +87,7 @@ export default function SignUp() {
             </div>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Account Created!</h2>
             <p className="mt-2 text-sm text-gray-600">
-              We've sent a verification email to <strong>{formData.email}</strong>. 
+              We&apos;ve sent a verification email to <strong>{formData.email}</strong>. 
               Please check your inbox and click the verification link to activate your account.
             </p>
             <div className="mt-4">

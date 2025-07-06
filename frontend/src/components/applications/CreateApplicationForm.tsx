@@ -37,7 +37,6 @@ const CreateApplicationForm: React.FC = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
 
   // Auto-assign staff_id to the logged-in user's id
   useEffect(() => {
@@ -267,7 +266,7 @@ const CreateApplicationForm: React.FC = () => {
                               </p>
                               {question.placeholder && (
                                 <p className="text-sm text-gray-500 italic mt-1">
-                                  Placeholder: "{question.placeholder}"
+                                  Placeholder: &quot;{question.placeholder}&quot;
                                 </p>
                               )}
                             </div>

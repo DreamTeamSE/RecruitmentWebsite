@@ -1,6 +1,4 @@
 // join-dte/[applicationId]/page.tsx
-"use client";
-
 import React from 'react';
 import ApplicationTemplate from '@/components/involved/join-dte/ApplicationTemplate';
 

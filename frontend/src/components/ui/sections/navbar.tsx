@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from "@/components/ui/button"; // Assuming this uses the buttonVariants from the Canvas
-import { Menu, X, ChevronDown, LogOut, LogIn, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
+import { Menu, X, ChevronDown, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
 import UserMenu from '@/components/auth/UserMenu';
 
 interface NavSubLinkItem {

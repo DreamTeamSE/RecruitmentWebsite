@@ -55,9 +55,7 @@ interface ReviewableApplicationCardProps extends ApplicationFormData {
 const ReviewableApplicationCard: React.FC<ReviewableApplicationCardProps> = ({ 
   id, 
   title, 
-  description, 
   created_at, 
-  onDelete, 
   isDeleting,
   onShowDeleteModal
 }) => {

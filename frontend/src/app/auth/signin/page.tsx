@@ -33,7 +33,7 @@ export default function SignIn() {
           router.push("/applications-review")
         }
       }
-    } catch (error) {
+    } catch {
       setError("An unexpected error occurred")
     } finally {
       setIsLoading(false)
@@ -108,7 +108,7 @@ export default function SignIn() {
               href="/auth/signup"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              Don't have an account? Sign up
+              Don&apos;t have an account? Sign up
             </Link>
           </div>
         </form>
