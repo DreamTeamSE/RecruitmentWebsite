@@ -9,15 +9,22 @@ logs/
 *.log
 *.log.*
 
-# Environment variables
+# Environment variables - DO NOT COMMIT
 .env
 .env.local
+.env.production
+.env.development
+.env.test
 .env.*.local
+.env.*.production
+.env.*.development
+.env.*.test
 
 # Build output
 dist/
 build/
 out/
+.next/
 
 # IDEs and editors
 .vscode/
@@ -40,3 +47,24 @@ Thumbs.db
 
 # Python virtual environment
 venv/
+__pycache__/
+*.pyc
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Deployment and sensitive files
+task-definition.json
+deployment-config.env
+*.pem
+*.key
+*.crt
+
+# Local database
+*.db
+*.sqlite
+*.sqlite3

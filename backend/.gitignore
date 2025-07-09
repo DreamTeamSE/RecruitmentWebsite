@@ -19,6 +19,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -30,8 +31,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# Environment variables - DO NOT COMMIT
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+.env.*.local
+.env.*.production
+.env.*.development
+.env.*.test
 
 # vercel
 .vercel
@@ -39,3 +48,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AWS and deployment files
+task-definition.json
+deployment-config.env
+*.pem
+*.key
+*.crt
+
+# Local database
+*.db
+*.sqlite
+*.sqlite3
