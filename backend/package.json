@@ -4,17 +4,13 @@
   "description": "Backend API for Recruitment Website",
   "main": "src/index.ts",
   "scripts": {
-    "start": "npx ts-node src/index.ts",
-    "dev": "npx nodemon --exec npx ts-node src/index.ts",
-    "dev:simple": "npx ts-node src/index.ts",
-    "dev:local": "NODE_ENV=development npx nodemon --exec npx ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc",
-    "check": "npx ts-node scripts/startup-check.ts",
-    "test": "npx ts-node scripts/test-crud.ts",
-    "validate": "node validate-setup.js",
+    "test": "jest",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
-    "db:setup": "psql -d recruitment_local -f postgres-init/01_user.sql && psql -d recruitment_local -f postgres-init/02_applications.sql && psql -d recruitment_local -f postgres-init/03_interview.sql && psql -d recruitment_local -f postgres-init/04_add_email_to_form_entries.sql && psql -d recruitment_local -f postgres-init/05_make_email_required.sql"
+    "lint": "eslint src --ext .ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

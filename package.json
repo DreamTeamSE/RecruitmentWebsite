@@ -15,10 +15,9 @@
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "cd backend && npm test",
     "test:frontend": "cd frontend && npm test",
-    "deploy:local": "./deploy.sh deploy-local",
-    "deploy:aws": "./deploy.sh deploy-aws",
-    "deploy:status": "./deploy.sh status",
-    "deploy:cleanup": "./deploy.sh cleanup"
+    "deploy": "./scripts/deploy.sh local",
+    "deploy:build": "./scripts/deploy.sh build",
+    "deploy:clean": "./scripts/deploy.sh clean"
   },
   "keywords": [
     "recruitment",
@@ -30,10 +29,6 @@
   "author": "Dream Team Engineering",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.10.0",
     "concurrently": "^7.6.0"
-  },
-  "devDependencies": {
-    "@types/axios": "^0.9.36"
   }
 }
