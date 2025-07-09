@@ -28,6 +28,38 @@
         {
           "name": "DATABASE_URL",
           "value": "postgresql://postgres:RecruitmentDB2025!@recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com:5432/postgres"
+        },
+        {
+          "name": "SMTP_HOST",
+          "value": "smtp.gmail.com"
+        },
+        {
+          "name": "SMTP_PORT",
+          "value": "587"
+        },
+        {
+          "name": "SMTP_SECURE",
+          "value": "false"
+        },
+        {
+          "name": "SMTP_USER",
+          "value": "internal.software@dreamteameng.org"
+        },
+        {
+          "name": "SMTP_PASSWORD",
+          "value": "nyjxpaxznbyaoemn"
+        },
+        {
+          "name": "SMTP_FROM",
+          "value": "internal.software@dreamteameng.org"
+        },
+        {
+          "name": "FRONTEND_URL",
+          "value": "https://main.d1d64zijwu2pjz.amplifyapp.com"
+        },
+        {
+          "name": "ALLOWED_ORIGINS",
+          "value": "https://main.d1d64zijwu2pjz.amplifyapp.com"
         }
       ],
       "logConfiguration": {
