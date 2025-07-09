@@ -1,10 +1,7 @@
 "use client"
 
-  "use client"
-
 import { useState } from "react"
 import Link from "next/link"
-import { getBackendUrl } from '@/lib/constants/string'
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -50,7 +47,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch(`${getBackendUrl()}/api/auth/register`, {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

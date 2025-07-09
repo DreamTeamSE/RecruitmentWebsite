@@ -40,6 +40,9 @@ const nextConfig: NextConfig = {
     domains: [],
     formats: ['image/avif', 'image/webp'],
   },
+  
+  // Font optimization
+  optimizeFonts: true,
 };
 
 export default nextConfig;

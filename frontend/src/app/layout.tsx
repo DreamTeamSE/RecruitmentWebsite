@@ -29,8 +29,12 @@ export const metadata: Metadata = {
   description: 'Dream Team Engineering recruitment and application platform',
   keywords: ['recruitment', 'engineering', 'applications', 'DTE'],
   authors: [{ name: 'Dream Team Engineering' }],
-  viewport: 'width=device-width, initial-scale=1',
 };
+
+export const generateViewport = () => ({
+  width: 'device-width',
+  initialScale: 1,
+});
 
 export default function RootLayout({
   children,
