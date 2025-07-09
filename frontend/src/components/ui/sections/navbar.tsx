@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"; // Assuming this uses the butto
 import { Menu, X, ChevronDown, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
 import UserMenu from '@/components/auth/UserMenu';
 import type { AuthenticatedUser } from '@/models/types/auth';
+import { useViewMode } from '@/contexts/ViewModeContext';
 
 interface NavSubLinkItem {
   href: string;
@@ -53,7 +54,7 @@ const baseNavLinks: NavLinkItem[] = [
       { href: "/get-involved/contact", label: "Contact" },
     ]
   },
-  { href: "/applications-review", label: "Applications", icon: <FileText size={18} />, requiresAuth: true }, // Application link requires auth
+  { href: "", label: "Applications", icon: <FileText size={18} />, requiresAuth: true }, // Dynamic Applications link
   { href: "/media", label: "Media", icon: <Tv size={18} /> },
 ];
 
@@ -62,13 +63,23 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { data: session, status } = useSession();
   const pathname = usePathname();
+  const { isAdminMode } = useViewMode();
 
-  // Filter nav links based on authentication status
+  // Filter nav links based on authentication status and set dynamic href
   const navLinks = baseNavLinks.filter(link => {
     if (link.requiresAuth) {
       return status === 'authenticated' && (session?.user as AuthenticatedUser)?.emailVerified;
     }
     return true;
+  }).map(link => {
+    // Set dynamic href for Applications link based on view mode
+    if (link.label === "Applications" && link.requiresAuth) {
+      return {
+        ...link,
+        href: isAdminMode ? "/applications-review" : "/get-involved/join-dte"
+      };
+    }
+    return link;
   });
 
   const toggleMobileMenu = () => {
