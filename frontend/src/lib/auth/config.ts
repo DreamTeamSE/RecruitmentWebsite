@@ -68,23 +68,25 @@ export const authOptions: any = {
           }
 
           const data = await response.json()
-          console.log('Backend success response received:', !!data.staff);
+          console.log('Backend success response received:', !!data);
+          console.log('Backend response data:', data);
           
+          // The backend returns user data directly, not wrapped in a "staff" object
           // Ensure the account is verified before allowing login
-          if (!data.staff.emailVerified) {
+          if (!data.emailVerified) {
             console.log('Error: Email not verified for user:', credentials.email);
             throw new Error("Please verify your email address before signing in")
           }
           
-          console.log('User authenticated successfully:', data.staff.email);
+          console.log('User authenticated successfully:', data.email);
           
           // Return user object that NextAuth expects
           return {
-            id: data.staff.id,
-            email: data.staff.email,
-            name: `${data.staff.first_name} ${data.staff.last_name}`,
-            role: data.staff.role || "staff",
-            emailVerified: data.staff.emailVerified,
+            id: data.id,
+            email: data.email,
+            name: `${data.first_name} ${data.last_name}`,
+            role: data.role || "staff",
+            emailVerified: data.emailVerified,
           }
         } catch (error) {
           console.log('Authorization error:', error instanceof Error ? error.message : 'Unknown error');
@@ -127,5 +129,5 @@ export const authOptions: any = {
     signIn: "/auth/signin",
     verifyRequest: "/auth/verify-request",
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || process.env.NEXT_PUBLIC_NEXTAUTH_SECRET || "j9Aupfj+wvAvPqhE3hB5e//Ix1PYwt7JQiZwXSUDrww=",
 }

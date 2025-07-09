@@ -4,30 +4,19 @@ const isCustomDevelopment = process.env.APP_ENV === 'development';
 const isCustomProduction = process.env.APP_ENV === 'production';
 
 export const BACKEND_URL = isCustomDevelopment
-  ? 'localhost:3000'
-  : process.env.BACKEND_URL || 'localhost:3000';
+  ? 'http://localhost:3000'
+  : process.env.NEXT_PUBLIC_BACKEND_URL || 'https://d2oc9fk5wyihzt.cloudfront.net';
 
 // Helper function to get the full backend URL with http prefix
 export const getBackendUrl = (): string => {
-  let baseUrl: string;
-  
   // Check custom APP_ENV first, then fall back to NODE_ENV
   if (isCustomDevelopment) {
-    baseUrl = 'localhost:3000';
+    return 'http://localhost:3000';
   } else if (isCustomProduction || process.env.NODE_ENV === 'production') {
-    baseUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'localhost:3000';
+    return process.env.NEXT_PUBLIC_BACKEND_URL || 'https://d2oc9fk5wyihzt.cloudfront.net';
   } else {
     // Default development behavior when APP_ENV is not set
-    baseUrl = 'localhost:3000';
-  }
-  
-  // Use HTTPS for production, HTTP for localhost
-  if (baseUrl.startsWith('http')) {
-    return baseUrl;
-  } else if (baseUrl.includes('localhost')) {
-    return `http://${baseUrl}`;
-  } else {
-    return `https://${baseUrl}`;
+    return 'http://localhost:3000';
   }
 };
 
