@@ -3,7 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './api/routes/routes';
 
-dotenv.config();
+// Load environment variables based on NODE_ENV
+if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: '.env.local' });
+} else if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' });
+} else {
+  dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;

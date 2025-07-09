@@ -17,6 +17,10 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
     },
+    tls: {
+        rejectUnauthorized: false
+    },
+    debug: process.env.NODE_ENV === 'development'
 });
 
 const sendVerificationEmail = async (email: string, token: string, firstName: string) => {
@@ -122,6 +126,11 @@ export const register = async (req: Request, res: Response) => {
             await sendVerificationEmail(email, token, firstName);
         } catch (emailError) {
             console.error("Failed to send verification email:", emailError);
+            // In development, provide the manual verification link
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`📧 [DEV MODE - EMAIL FAILED] Verification token: ${token}`);
+                console.log(`📧 [DEV MODE - EMAIL FAILED] Manual verification link: ${process.env.FRONTEND_URL || 'http://localhost:3001'}/auth/verify-email?token=${token}`);
+            }
         }
 
         res.status(201).json({
