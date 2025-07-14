@@ -32,7 +32,7 @@ export const createForm = async (req: Request, res: Response) => {
 
 // PUT /forms/:id
 export const updateForm = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.id);
+  const formId = parseInt(req.params.id!);
   const formData = req.body;
 
   try {
@@ -45,8 +45,8 @@ export const updateForm = async (req: Request, res: Response) => {
 
 // DELETE /forms/:formId/questions/:questionId
 export const deleteQuestion = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.formId);
-  const questionId = parseInt(req.params.questionId);
+  const formId = parseInt(req.params.formId!);
+  const questionId = parseInt(req.params.questionId!);
 
   try {
     const deletedQuestion = await deleteQuestionById(formId, questionId);
@@ -62,7 +62,7 @@ export const deleteQuestion = async (req: Request, res: Response) => {
 
 // POST /forms/:formId/questions
 export const createQuestion = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.formId);
+  const formId = parseInt(req.params.formId!);
   const { text, type, question_text, question_type, question_order } = req.body;
 
   // Support both formats: {text, type} or {question_text, question_type}
@@ -82,7 +82,7 @@ export const createQuestion = async (req: Request, res: Response) => {
 
 // GET /forms/:id
 export const getFormById = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.id);
+  const formId = parseInt(req.params.id!);
 
   // Validate formId
   if (isNaN(formId)) {
@@ -104,7 +104,7 @@ export const getFormById = async (req: Request, res: Response) => {
 
 // DELETE /questions/:questionId - Alternative endpoint for deleting questions by ID only
 export const deleteQuestionOnly = async (req: Request, res: Response) => {
-  const questionId = parseInt(req.params.questionId);
+  const questionId = parseInt(req.params.questionId!);
 
   if (isNaN(questionId)) {
     res.status(400).json({ message: "Invalid question ID. It must be a number." });
@@ -127,7 +127,7 @@ export const deleteQuestionOnly = async (req: Request, res: Response) => {
 
 // DELETE /forms/:id
 export const deleteForm = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.id);
+  const formId = parseInt(req.params.id!);
 
   try {
     const deletedForm = await deleteFormById(formId);
@@ -143,7 +143,7 @@ export const deleteForm = async (req: Request, res: Response) => {
 
 // GET /forms/:formId/entries
 export const getFormEntries = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.formId);
+  const formId = parseInt(req.params.formId!);
 
   try {
     const entries = await selectFormEntriesById(formId);
@@ -184,8 +184,8 @@ export const getFormEntries = async (req: Request, res: Response) => {
 
 // GET /forms/:formId/entries/:entryId
 export const getFormEntryById = async (req: Request, res: Response) => {
-  const formId = parseInt(req.params.formId);
-  const entryId = parseInt(req.params.entryId);
+  const formId = parseInt(req.params.formId!);
+  const entryId = parseInt(req.params.entryId!);
 
   try {
     // First, get the specific entry

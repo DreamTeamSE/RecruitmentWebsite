@@ -133,12 +133,12 @@ export const register = async (req: Request, res: Response) => {
             }
         }
 
-        res.status(201).json({
+        return res.status(201).json({
             message: "Account created successfully. Please check your email to verify your account.",
         });
     } catch (error) {
         console.error("Error creating staff account:", (error as Error).message);
-        res.status(500).json({ 
+        return res.status(500).json({ 
             message: "Failed to create account", 
             error: (error as Error).message 
         });
@@ -180,10 +180,10 @@ export const login = async (req: Request, res: Response) => {
             emailVerified: staff.email_verified,
         };
 
-        res.status(200).json(userData);
+        return res.status(200).json(userData);
     } catch (error) {
         console.error("Error during login:", (error as Error).message);
-        res.status(500).json({ 
+        return res.status(500).json({ 
             message: "Login failed", 
             error: (error as Error).message 
         });
@@ -228,12 +228,12 @@ export const verifyEmail = async (req: Request, res: Response) => {
         // Remove from pending
         delete pendingVerifications[pending.email];
 
-        res.status(200).json({ 
+        return res.status(200).json({ 
             message: "Email verified successfully" 
         });
     } catch (error) {
         console.error("Error verifying email:", (error as Error).message);
-        res.status(500).json({ 
+        return res.status(500).json({ 
             message: "Email verification failed", 
             error: (error as Error).message 
         });

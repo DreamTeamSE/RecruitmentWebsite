@@ -75,7 +75,7 @@ export const getAnswersByFormEntryId = async (req: Request, res: Response) => {
 // Questions
 export const deleteQuestionById = async (req: Request, res: Response) => {
   try {
-    const questionId = parseInt(req.params.questionId);
+    const questionId = parseInt(req.params.questionId!);
     
     if (isNaN(questionId)) {
       res.status(400).json({ message: "Invalid question ID. It must be a number." });

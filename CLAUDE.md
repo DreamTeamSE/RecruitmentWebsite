@@ -129,9 +129,9 @@ Backend is configured to accept requests from:
 ## Deployment
 
 ### Local Development
-Use provided scripts:
-- `./deploy-backend.sh` - Start database and backend
-- `./deploy-frontend.sh` - Build and start frontend
+Use provided scripts in `/scripts/` directory:
+- `./scripts/deploy-backend.sh` - Start database and backend
+- `./scripts/deploy-frontend.sh` - Build and start frontend
 - Root `npm run dev` for concurrent development
 
 ### Production

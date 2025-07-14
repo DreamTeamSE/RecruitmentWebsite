@@ -3,7 +3,7 @@ import { upsertStaffApplicationNotes, getStaffApplicationNotesByFormEntryId } fr
 
 // POST /api/forms/entries/:entryId/review
 export const saveStaffApplicationReview = async (req: Request, res: Response) => {
-    const entryId = parseInt(req.params.entryId);
+    const entryId = parseInt(req.params.entryId!);
     const { notes, score } = req.body;
 
     // Validate entryId
@@ -47,7 +47,7 @@ export const saveStaffApplicationReview = async (req: Request, res: Response) =>
 
 // GET /api/forms/entries/:entryId/review
 export const getStaffApplicationReview = async (req: Request, res: Response) => {
-    const entryId = parseInt(req.params.entryId);
+    const entryId = parseInt(req.params.entryId!);
 
     // Validate entryId
     if (isNaN(entryId)) {
