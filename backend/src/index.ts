@@ -2,59 +2,60 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './api/routes/routes';
+import { setupMiddleware } from './middleware';
+import { setupErrorHandlers } from './middleware/errorHandler';
 
-// Load environment variables based on NODE_ENV
-if (process.env.NODE_ENV === 'development') {
-  dotenv.config({ path: '.env.local' });
-} else if (process.env.NODE_ENV === 'production') {
-  dotenv.config({ path: '.env.production' });
-} else {
-  dotenv.config();
-}
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enhanced CORS configuration for mixed content scenarios
+const ALLOWED_ORIGINS = [
+  'http://localhost:3001',
+  'http://localhost:3000',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  /\.amplifyapp\.com$/,
+  /\.cloudfront\.net$/
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3001',
-    'http://localhost:3000', 
-    'https://main.d1d64zijwu2pjz.amplifyapp.com',
-    'https://djv0v2xedq0s9.cloudfront.net',
-    'https://d2oc9fk5wyihzt.cloudfront.net',
-    /\.amplifyapp\.com$/,
-    /\.cloudfront\.net$/
-  ],
+  origin: ALLOWED_ORIGINS,
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Security headers to help with mixed content
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
+setupMiddleware(app);
 
-app.use(express.json());
-
-// Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 app.use('/api', router);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+setupErrorHandlers(app);
+
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
 });
