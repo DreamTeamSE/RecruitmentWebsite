@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import router from './api/routes/routes';
 import { setupMiddleware } from './middleware';
 import { setupErrorHandlers } from './middleware/errorHandler';
+import { HealthService } from './services/healthService';
 
 dotenv.config();
 
@@ -28,12 +29,28 @@ app.use(cors({
 
 setupMiddleware(app);
 
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+app.get('/health', async (req, res) => {
+  try {
+    const healthStatus = await HealthService.checkHealth();
+    const statusCode = HealthService.getStatusCode(healthStatus);
+    res.status(statusCode).json(healthStatus);
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: 'Health check service failed',
+      database: {
+        connected: false,
+        error: 'Health check service error'
+      },
+      application: {
+        version: 'unknown',
+        uptime: 0,
+        environment: process.env.NODE_ENV || 'development'
+      }
+    });
+  }
 });
 
 app.use('/api', router);

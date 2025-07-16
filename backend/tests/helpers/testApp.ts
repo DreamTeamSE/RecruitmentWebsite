@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import apiRoutes from '../../src/api/routes/routes';
+import { HealthService } from '../../src/services/healthService';
 
 // Create test application
 export function createTestApp() {
@@ -15,8 +16,28 @@ export function createTestApp() {
   app.use('/api', apiRoutes);
   
   // Health check endpoint
-  app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+  app.get('/health', async (req, res) => {
+    try {
+      const healthStatus = await HealthService.checkHealth();
+      const statusCode = HealthService.getStatusCode(healthStatus);
+      res.status(statusCode).json(healthStatus);
+    } catch (error) {
+      console.error('Health check failed:', error);
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: 'Health check service failed',
+        database: {
+          connected: false,
+          error: 'Health check service error'
+        },
+        application: {
+          version: 'unknown',
+          uptime: 0,
+          environment: process.env.NODE_ENV || 'development'
+        }
+      });
+    }
   });
   
   return app;
