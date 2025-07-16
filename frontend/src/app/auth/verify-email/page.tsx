@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { getBackendUrl } from '@/lib/constants/string'
+import { authService } from "@/lib/auth/authService"
 
 function VerifyEmailContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -20,19 +20,7 @@ function VerifyEmailContent() {
       }
 
       try {
-        const response = await fetch(`${getBackendUrl()}/api/auth/verify-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token }),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Verification failed')
-        }
-
+        await authService.verifyEmail(token)
         setStatus('success')
         setMessage('Email verified successfully! You can now sign in.')
       } catch (error) {

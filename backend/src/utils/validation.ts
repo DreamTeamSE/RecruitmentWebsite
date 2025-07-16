@@ -25,7 +25,7 @@ export const validatePassword = (password: string): void => {
   }
 };
 
-export const validateRequired = (value: any, fieldName: string): void => {
+export const validateRequired = (value: unknown, fieldName: string): void => {
   if (!value || (typeof value === 'string' && value.trim().length === 0)) {
     throw createError(`${fieldName} is required`, 400);
   }

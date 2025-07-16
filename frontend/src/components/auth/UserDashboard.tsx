@@ -1,9 +1,8 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
-import type { AuthenticatedUser } from '@/models/types/auth';
 import { Button } from '@/components/ui/button';
 
 interface DashboardAction {
@@ -17,13 +16,22 @@ const LoadingSpinner = () => (
   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
 );
 
-const UserInfoCard = ({ user }: { user: AuthenticatedUser }) => (
+interface User {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  emailVerified: boolean;
+}
+
+const UserInfoCard = ({ user }: { user: User }) => (
   <div className="bg-gray-50 p-6 rounded-lg">
     <h2 className="text-lg font-semibold text-gray-800 mb-4">User Information</h2>
     <div className="space-y-3">
       <div className="flex justify-between">
         <span className="font-medium text-gray-600">Name:</span>
-        <span className="text-gray-900">{user.name}</span>
+        <span className="text-gray-900">{user.first_name} {user.last_name}</span>
       </div>
       <div className="flex justify-between">
         <span className="font-medium text-gray-600">Email:</span>
@@ -80,7 +88,7 @@ const QuickActionsCard = ({
 );
 
 export default function UserDashboard() {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const router = useRouter();
 
   const handleActionClick = useCallback((path: string) => {
@@ -88,16 +96,17 @@ export default function UserDashboard() {
   }, [router]);
 
   const handleSignOut = useCallback(() => {
-    signOut({ callbackUrl: "/" });
-  }, []);
+    logout();
+    router.push("/");
+  }, [logout, router]);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!isLoading && !isAuthenticated) {
       router.push("/auth/signin");
     }
-  }, [status, router]);
+  }, [isLoading, isAuthenticated, router]);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -108,12 +117,7 @@ export default function UserDashboard() {
     );
   }
 
-  if (status === "unauthenticated") {
-    return null;
-  }
-
-  const user = session?.user as AuthenticatedUser;
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return null;
   }
 
@@ -136,7 +140,7 @@ export default function UserDashboard() {
         <div className="bg-white rounded-lg shadow-md p-8">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Staff Dashboard</h1>
-            <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
+            <p className="text-gray-600 mt-2">Welcome back, {user.first_name} {user.last_name}</p>
           </header>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

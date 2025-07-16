@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useAuth } from "@/contexts/AuthContext"
+import { authService } from "@/lib/auth/authService"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -11,6 +12,7 @@ export default function SignIn() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,23 +20,11 @@ export default function SignIn() {
     setIsLoading(true)
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError(result.error)
-      } else if (result?.ok) {
-        // Check if user is authenticated and redirect
-        const session = await getSession()
-        if (session) {
-          router.push("/applications-review")
-        }
-      }
-    } catch {
-      setError("An unexpected error occurred")
+      const user = await authService.login({ email, password })
+      login(user)
+      router.push("/applications-review")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }

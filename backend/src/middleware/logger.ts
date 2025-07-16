@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../services/logger.service';
 
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const start = Date.now();
@@ -8,12 +9,13 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
     const { method, url } = req;
     const { statusCode } = res;
     
-    const log = `${method} ${url} ${statusCode} - ${duration}ms`;
+    const logMessage = `${method} ${url}`;
+    const logContext = { statusCode, duration: `${duration}ms` };
     
     if (statusCode >= 400) {
-      console.error(`❌ ${log}`);
+      logger.error(logMessage, logContext);
     } else {
-      console.log(`✅ ${log}`);
+      logger.info(logMessage, logContext);
     }
   });
   

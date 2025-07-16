@@ -7,6 +7,7 @@ import { filledApplicationData } from '@/lib/data/application/application';
 import { ApplicationQuestion } from '@/models/types/application';
 import { getBackendUrl } from '@/lib/constants/string';
 import { ApplicationFormData, fetchForms } from '@/lib/data/application/forms';
+import { logger } from '@/lib/services/logger.service';
 
 const ArrowLeft = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2">
@@ -96,7 +97,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           }
         }
       } catch (error) {
-        console.error('Error loading form data:', error);
+        logger.error('Error loading form data', error);
       } finally {
         setIsLoading(false);
       }
@@ -189,7 +190,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       }
 
       const applicantResult = await applicantResponse.json();
-      console.log("Applicant created:", applicantResult);
+      logger.debug("Applicant created", { applicant: applicantResult });
       
       const applicant_id = applicantResult.inserted_applicant.id;
       const form_id = parseInt(applicationId); // Use the form ID directly from the URL
@@ -215,7 +216,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       }
 
       const formEntryResult = await formEntryResponse.json();
-      console.log("Form entry created:", formEntryResult);
+      logger.debug("Form entry created", { formEntry: formEntryResult });
       
       const form_entry_id = formEntryResult.formEntry.id;
 
@@ -226,7 +227,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       if (questionsResponse.ok) {
         const questionsResult = await questionsResponse.json();
         existingQuestions = questionsResult.question || [];
-        console.log("Existing questions:", existingQuestions);
+        logger.debug("Existing questions", { questions: existingQuestions });
       }
 
       // Step 4: Submit answers for each question
@@ -238,7 +239,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           const answer_text = formData[question.id];
           
           if (!answer_text || answer_text.trim() === '') {
-            console.warn(`No answer provided for question: ${question.id}`);
+            logger.warn("No answer provided for question", { questionId: question.id });
             continue;
           }
 
@@ -264,13 +265,13 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
               if (createQuestionResponse.ok) {
                 const questionResult = await createQuestionResponse.json();
                 questionRecord = questionResult.question;
-                console.log(`Created question ${question.id}:`, questionResult);
+                logger.debug("Created question", { questionId: question.id, result: questionResult });
               } else {
-                console.error(`Failed to create question ${question.id}`);
+                logger.error("Failed to create question", undefined, { questionId: question.id });
                 continue;
               }
             } catch (error) {
-              console.error(`Error creating question ${question.id}:`, error);
+              logger.error("Error creating question", error, { questionId: question.id });
               continue;
             }
           }
@@ -295,20 +296,22 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           }
 
           const answerResult = await answerResponse.json();
-          console.log(`Answer submitted for ${question.id}:`, answerResult);
+          logger.debug("Answer submitted", { questionId: question.id, result: answerResult });
         }
       }
 
       alert(`Application submitted successfully! Applicant ID: ${applicant_id}, Form Entry ID: ${form_entry_id}`);
-      console.log("Form Data:", formData);
-      console.log("Created Applicant:", applicantResult.inserted_applicant);
-      console.log("Created Form Entry:", formEntryResult.formEntry);
+      logger.debug("Application submission completed", {
+        formData,
+        applicant: applicantResult.inserted_applicant,
+        formEntry: formEntryResult.formEntry
+      });
       
       // Return the inserted_applicant as requested
       return applicantResult.inserted_applicant;
       
     } catch (error) {
-      console.error("Error submitting application:", error);
+      logger.error("Error submitting application", error);
       alert(`Failed to submit application: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);

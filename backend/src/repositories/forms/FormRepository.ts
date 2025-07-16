@@ -34,7 +34,12 @@ const selectFeed = async (): Promise<Form[]> => {
     }
 }
 
-export const updateFormById = async (formId: number, formData: any) => {
+interface FormUpdateData {
+  title: string;
+  description: string;
+}
+
+export const updateFormById = async (formId: number, formData: FormUpdateData): Promise<Form> => {
   const query = `
     UPDATE Forms 
     SET title = $1, description = $2

@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -15,26 +15,26 @@ export default function AuthGuard({
   requireAuth = true, 
   redirectTo = "/auth/signin" 
 }: AuthGuardProps) {
-  const { data: session, status } = useSession()
+  const { user, isLoading, isAuthenticated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === "loading") return // Still loading
+    if (isLoading) return
 
-    if (requireAuth && status === "unauthenticated") {
+    if (requireAuth && !isAuthenticated) {
       router.push(redirectTo)
       return
     }
 
     // Check if email is verified for authenticated users
-    if (requireAuth && session && session.user && !(session.user as { emailVerified?: boolean }).emailVerified) {
+    if (requireAuth && user && !user.emailVerified) {
       router.push("/auth/verify-request")
       return
     }
-  }, [session, status, requireAuth, redirectTo, router])
+  }, [user, isLoading, isAuthenticated, requireAuth, redirectTo, router])
 
   // Show loading while checking authentication
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -46,7 +46,7 @@ export default function AuthGuard({
   }
 
   // Don't render children if authentication is required but user is not authenticated
-  if (requireAuth && (status === "unauthenticated" || (session && session.user && !('emailVerified' in session.user && session.user.emailVerified)))) {
+  if (requireAuth && (!isAuthenticated || (user && !user.emailVerified))) {
     return null
   }
 

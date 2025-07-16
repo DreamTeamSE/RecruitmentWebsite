@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { authService } from "@/lib/auth/authService"
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -47,23 +48,12 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-        }),
+      await authService.register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Registration failed")
-      }
 
       setSuccess(true)
     } catch (error) {

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { FormDataState } from '@/models/types/application';
 import { ApplicationDetailProps } from '@/models/types/application';
+import { logger } from '@/lib/services/logger.service';
+import { toast } from '@/lib/services/toast.service';
 
 export function useApplicationForm(application: ApplicationDetailProps['application']) {
   const [formData, setFormData] = useState<FormDataState>(() => {
@@ -22,8 +24,11 @@ export function useApplicationForm(application: ApplicationDetailProps['applicat
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Application Submitted for:", application.name, "| Data:", formData);
-    alert(`Application for "${application.name}" submitted! (Check console for data)`);
+    logger.userAction('Application submitted', {
+      applicationName: application.name,
+      formData
+    });
+    toast.success(`Application for "${application.name}" submitted successfully!`);
   };
 
   return {

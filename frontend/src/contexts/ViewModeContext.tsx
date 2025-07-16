@@ -1,8 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useSession } from 'next-auth/react';
-import type { AuthenticatedUser } from '@/models/types/auth';
+import { useAuth } from './AuthContext';
 import { getRolePermissions } from '@/models/types/auth';
 
 export type ViewMode = 'admin' | 'user';
@@ -22,19 +21,18 @@ interface ViewModeProviderProps {
 }
 
 export function ViewModeProvider({ children }: ViewModeProviderProps) {
-  const { data: session, status } = useSession();
+  const { user, isAuthenticated } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('user');
 
   // Check if user has admin/recruiter permissions
   const canToggleMode = React.useMemo(() => {
-    if (status !== 'authenticated' || !session?.user) return false;
+    if (!isAuthenticated || !user) return false;
 
-    const user = session.user as AuthenticatedUser;
     const permissions = getRolePermissions(user.role);
 
     // Only admin and recruiter can toggle modes
     return permissions.canAccessAdminPanel || permissions.canReviewApplications;
-  }, [session, status]);
+  }, [user, isAuthenticated]);
 
   // Reset to user mode when user logs out or loses permissions
   useEffect(() => {

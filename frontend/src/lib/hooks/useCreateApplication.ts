@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/contexts/AuthContext';
 import { ApplicationQuestion } from '@/models/types/application';
 import { apiService } from '@/lib/services/api.service';
 
@@ -24,13 +24,13 @@ interface UseCreateApplicationReturn {
 }
 
 export const useCreateApplication = (): UseCreateApplicationReturn => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState<CreateApplicationFormData>({
     title: '',
     description: '',
-    staff_id: (session?.user as { id: string })?.id || '',
+    staff_id: user?.id || '',
     questions: []
   });
 

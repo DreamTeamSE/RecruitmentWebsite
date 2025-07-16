@@ -4,11 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button"; // Assuming this uses the buttonVariants from the Canvas
-import { Menu, X, ChevronDown, FileText, Home as HomeIcon, Briefcase, CalendarDays, Users, Tv } from 'lucide-react'; // Added more specific icons
+import { Menu, X, ChevronDown, FileText, Home as HomeIcon, Users } from 'lucide-react';
 import UserMenu from '@/components/auth/UserMenu';
-import type { AuthenticatedUser } from '@/models/types/auth';
 import { useViewMode } from '@/contexts/ViewModeContext';
 
 interface NavSubLinkItem {
@@ -32,43 +31,30 @@ const navbarOutlineColor = "border-[#A5B4FC]"; // Light blue outline
 const baseNavLinks: NavLinkItem[] = [
   { href: "/", label: "Home", icon: <HomeIcon size={18} /> },
   {
-    href: "/branches",
-    label: "Branches",
-    icon: <Briefcase size={18} />,
-    sublinks: [
-      { href: "/branches/design", label: "Design" },
-      { href: "/branches/software", label: "Software" },
-      { href: "/branches/research", label: "Research" },
-      { href: "/branches/shadowing", label: "Shadowing" },
-    ]
-  },
-  { href: "/events", label: "Events", icon: <CalendarDays size={18} /> },
-  {
     href: "/get-involved",
     label: "Get Involved",
     icon: <Users size={18} />,
     sublinks: [
       { href: "/get-involved/about-us", label: "About Us" },
-      { href: "/get-involved/join-dte", label: "Join DTE" },
+      { href: "/get-involved/join-dte", label: "Apply Now" },
       { href: "/get-involved/sponsor-us", label: "Sponsor Us" },
       { href: "/get-involved/contact", label: "Contact" },
     ]
   },
   { href: "", label: "Applications", icon: <FileText size={18} />, requiresAuth: true }, // Dynamic Applications link
-  { href: "/media", label: "Media", icon: <Tv size={18} /> },
 ];
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const { data: session, status } = useSession();
+  const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
   const { isAdminMode } = useViewMode();
 
   // Filter nav links based on authentication status and set dynamic href
   const navLinks = baseNavLinks.filter(link => {
     if (link.requiresAuth) {
-      return status === 'authenticated' && (session?.user as AuthenticatedUser)?.emailVerified;
+      return isAuthenticated && user?.emailVerified;
     }
     return true;
   }).map(link => {

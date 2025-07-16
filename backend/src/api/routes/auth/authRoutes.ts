@@ -6,6 +6,7 @@ import {
     validateStaffPassword 
 } from '../../../repositories/user/StaffRepository';
 import * as nodemailer from 'nodemailer';
+import { logger } from '../../../services/logger.service';
 
 const router = Router();
 
@@ -198,9 +199,12 @@ const login = async (req: Request, res: Response): Promise<void> => {
             emailVerified: staff.email_verified,
         };
 
-        res.status(200).json({ staff: userData });
+        res.status(200).json(userData);
     } catch (error) {
-        console.error("Error during login:", (error as Error).message);
+        logger.error("Error during login", { 
+            error: (error as Error).message,
+            email: req.body.email 
+        });
         res.status(500).json({ 
             message: "Login failed", 
             error: (error as Error).message 
