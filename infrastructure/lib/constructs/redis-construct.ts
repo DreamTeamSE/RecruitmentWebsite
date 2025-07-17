@@ -82,7 +82,7 @@ export class RedisConstruct extends Construct {
       vpcSecurityGroupIds: [props.securityGroup.securityGroupId],
       
       // Naming
-      clusterId: `recruitment-${props.environmentName}-redis`,
+      clusterName: `recruitment-${props.environmentName}-redis`,
       
       // Backup configuration
       snapshotRetentionLimit: props.config.enableBackup ? props.config.backupRetentionLimit : 0,
@@ -91,15 +91,15 @@ export class RedisConstruct extends Construct {
       
       // Encryption configuration
       transitEncryptionEnabled: props.config.enableTransitEncryption,
-      atRestEncryptionEnabled: props.config.enableAtRestEncryption,
-      kmsKeyId: this.encryptionKey?.keyId,
       
       // Logging configuration
       logDeliveryConfigurations: props.enableLogging ? [
         {
           destinationType: 'cloudwatch-logs',
           destinationDetails: {
-            logGroup: this.logGroup!.logGroupName,
+            cloudWatchLogsDetails: {
+              logGroup: this.logGroup!.logGroupName,
+            },
           },
           logFormat: 'json',
           logType: 'slow-log',

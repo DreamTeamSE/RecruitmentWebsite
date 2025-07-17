@@ -1,0 +1,51 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200": {
+      "displayName": "RecruitmentStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code",
+      "source": {
+        "path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "229746606296-us-east-2-f64450ef": {
+          "bucketName": "cdk-hnb659fds-assets-229746606296-us-east-2",
+          "objectKey": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-file-publishing-role-229746606296-us-east-2"
+        }
+      }
+    },
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "RecruitmentStack/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "229746606296-us-east-2-fd63f213": {
+          "bucketName": "cdk-hnb659fds-assets-229746606296-us-east-2",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-file-publishing-role-229746606296-us-east-2"
+        }
+      }
+    },
+    "66bb747033a231cbf7fe62aa42a6435d9aad594df858e26b893f29d54459d631": {
+      "displayName": "RecruitmentStack Template",
+      "source": {
+        "path": "RecruitmentStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "229746606296-us-east-2-8e42d626": {
+          "bucketName": "cdk-hnb659fds-assets-229746606296-us-east-2",
+          "objectKey": "66bb747033a231cbf7fe62aa42a6435d9aad594df858e26b893f29d54459d631.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-file-publishing-role-229746606296-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,36 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "RecruitmentTestStack/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "229746606296-us-east-2-fd63f213": {
+          "bucketName": "cdk-hnb659fds-assets-229746606296-us-east-2",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-file-publishing-role-229746606296-us-east-2"
+        }
+      }
+    },
+    "a000f34b7672888084ad39c20542f469c0c7e23532496859e44e47a82dacdd88": {
+      "displayName": "RecruitmentTestStack Template",
+      "source": {
+        "path": "RecruitmentTestStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "229746606296-us-east-2-04b0cb14": {
+          "bucketName": "cdk-hnb659fds-assets-229746606296-us-east-2",
+          "objectKey": "a000f34b7672888084ad39c20542f469c0c7e23532496859e44e47a82dacdd88.json",
+          "region": "us-east-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-file-publishing-role-229746606296-us-east-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

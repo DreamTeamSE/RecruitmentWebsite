@@ -1,1 +1,1 @@
-claude --dangerously-skip-permissions
+claude --continue --dangerously-skip-permissions 

@@ -24,7 +24,7 @@ export class RecruitmentDataStack extends cdk.Stack {
         cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: props.config.environmentName !== 'prod',
       versioned: props.config.environmentName === 'prod',
-      encryption: props.config.security.enableEncryption ? 
+      encryption: props.config.compliance.enableEncryption ? 
         s3.BucketEncryption.S3_MANAGED : 
         s3.BucketEncryption.UNENCRYPTED,
       publicReadAccess: false,
@@ -87,7 +87,7 @@ export class RecruitmentDataStack extends cdk.Stack {
       environmentName: props.config.environmentName,
       vpc: props.vpc,
       securityGroup: props.databaseSecurityGroup,
-      enableEncryption: props.config.security.enableEncryption,
+      enableEncryption: props.config.compliance.enableEncryption,
       enablePerformanceInsights: props.config.monitoring.enablePerformanceInsights,
       enableEnhancedMonitoring: props.config.monitoring.enableEnhancedMonitoring,
       enableBackups: props.config.security.enableBackupVault,
@@ -102,7 +102,7 @@ export class RecruitmentDataStack extends cdk.Stack {
       environmentName: props.config.environmentName,
       vpc: props.vpc,
       securityGroup: props.redisSecurityGroup,
-      enableEncryption: props.config.security.enableEncryption,
+      enableEncryption: props.config.compliance.enableEncryption,
       enableLogging: props.config.monitoring.enableEnhancedMonitoring,
     });
 
