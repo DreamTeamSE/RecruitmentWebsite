@@ -381,7 +381,7 @@
               "new FargateService2 (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/node_modules/aws-cdk-lib/aws-ecs/lib/fargate/fargate-service.js:1:3888)",
               "new FargateService2 (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/node_modules/aws-cdk-lib/core/lib/prop-injectable.js:1:488)",
               "new SimpleRecruitmentStack (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/lib/simple-recruitment-stack.ts:128:21)",
-              "Object.<anonymous> (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/bin/recruitment-app.ts:9:1)",
+              "Object.<anonymous> (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/bin/simple-recruitment-app.ts:9:1)",
               "Module._compile (node:internal/modules/cjs/loader:1723:14)",
               "Module.m._compile (/Users/maxmartin/projects/RecruitmentWebsite/infrastructure/node_modules/ts-node/src/index.ts:1618:23)",
               "loadTS (node:internal/modules/cjs/loader:1815:10)",

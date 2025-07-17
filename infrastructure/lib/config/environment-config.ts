@@ -400,3 +400,9 @@ export function validateEnvironmentConfig(config: EnvironmentConfig): void {
 }
 
 export { developmentConfig, stagingConfig, productionConfig };
+
+// Export specific config types for individual constructs
+export type { NetworkConfig as VpcConfig, EcsConfig, DatabaseConfig as RdsConfig, MonitoringConfig } from './types';
+
+// Re-export commonly used types
+export type { EnvironmentConfig, EnvironmentName, DatabaseConfig, RedisConfig, NetworkConfig } from './types';
