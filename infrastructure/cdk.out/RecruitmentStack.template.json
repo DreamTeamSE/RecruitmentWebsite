@@ -1328,24 +1328,216 @@
     "aws:cdk:path": "RecruitmentStack/TargetGroup/Resource"
    }
   },
-  "FrontendApp": {
-   "Type": "AWS::Amplify::App",
+  "FrontendSecurityGroup69AD9D5B": {
+   "Type": "AWS::EC2::SecurityGroup",
    "Properties": {
-    "Description": "Recruitment website frontend",
-    "Name": "recruitment-dev"
+    "GroupDescription": "Security group for frontend EC2 instance",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow SSH access",
+      "FromPort": 22,
+      "IpProtocol": "tcp",
+      "ToPort": 22
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow HTTP access",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow Next.js app access",
+      "FromPort": 3001,
+      "IpProtocol": "tcp",
+      "ToPort": 3001
+     }
+    ],
+    "VpcId": {
+     "Ref": "VPCB9E5F0B4"
+    }
    },
    "Metadata": {
-    "aws:cdk:path": "RecruitmentStack/FrontendApp"
+    "aws:cdk:path": "RecruitmentStack/FrontendSecurityGroup/Resource"
+   }
+  },
+  "FrontendSecurityGroupfromRecruitmentStackAlbSecurityGroupD96B49D93001DFB78892": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Allow ALB to frontend",
+    "FromPort": 3001,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "FrontendSecurityGroup69AD9D5B",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AlbSecurityGroup86A59E99",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3001
+   },
+   "Metadata": {
+    "aws:cdk:path": "RecruitmentStack/FrontendSecurityGroup/from RecruitmentStackAlbSecurityGroupD96B49D9:3001"
+   }
+  },
+  "FrontendRole815EA6D6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ec2.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/CloudWatchAgentServerPolicy"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RecruitmentStack/FrontendRole/Resource"
+   }
+  },
+  "FrontendInstanceProfile": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "FrontendRole815EA6D6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RecruitmentStack/FrontendInstanceProfile"
+   }
+  },
+  "FrontendInstanceInstanceProfile13DD5D96": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "FrontendRole815EA6D6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RecruitmentStack/FrontendInstance/InstanceProfile"
+   }
+  },
+  "FrontendInstance4958698D": {
+   "Type": "AWS::EC2::Instance",
+   "Properties": {
+    "AvailabilityZone": "us-east-2a",
+    "IamInstanceProfile": {
+     "Ref": "FrontendInstanceInstanceProfile13DD5D96"
+    },
+    "ImageId": {
+     "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
+    },
+    "InstanceType": "t3.micro",
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "FrontendSecurityGroup69AD9D5B",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": {
+     "Ref": "VPCPublicSubnet1SubnetB4246D30"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "RecruitmentStack/FrontendInstance"
+     }
+    ],
+    "UserData": {
+     "Fn::Base64": {
+      "Fn::Join": [
+       "",
+       [
+        "#!/bin/bash\nyum update -y\nyum install -y nodejs npm\nnpm install -g serve\nmkdir -p /opt/recruitment-frontend\ncat > /opt/recruitment-frontend/index.html << EOF\n<!DOCTYPE html>\n<html><head><title>Recruitment Website</title></head>\n<body>\n<h1>Recruitment Website Frontend</h1>\n<p>This is running on EC2!</p>\n<p>Backend URL: http://",
+        {
+         "Fn::GetAtt": [
+          "LoadBalancerBE9EEC3A",
+          "DNSName"
+         ]
+        },
+        "</p>\n<p>Instance ID: $(curl -s http://169.254.169.254/latest/meta-data/instance-id)</p>\n</body></html>\nEOF\ncd /opt/recruitment-frontend && nohup serve . -p 3001 > /var/log/frontend.log 2>&1 &\ncd /opt/recruitment-frontend && nohup python3 -m http.server 80 > /var/log/backup-server.log 2>&1 &"
+       ]
+      ]
+     }
+    }
+   },
+   "DependsOn": [
+    "FrontendRole815EA6D6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RecruitmentStack/FrontendInstance/Resource"
    }
   },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31T227bMAz9lr0rWpEC23OcbEWAYjOSoq8DLTMeG1sydHERGP73UVZ8WTHsiYeHlHhISlu5ffgiHz7Bu9uo8rqpqZD92YO6CqZ+9ai2sn9tldhf9Gu+F3koalLnUGj0kVvQyQSPL1DUuPALt3POKAJPRs/JEXw75tH8AP8EHt/hJnJLHcPl4qP2aBlPCUnJ3dt51vq7Qe3FGVWw5G9P1oR21PBf4qgri84Nwj3KPgvqmqrdUTK54WZvC538QdjSyf4AHgpweNTOg1YokuS52iFbE1M2a7Cp0iGbTrKGkXUNaKjQyj6JjYnJvICt0K+anRM+RgaBisXt6+B4bDFvgt85E+I63PWAF9I0LeMjY7QH0mhX3P3sGW1HKi04wViO9Z6wNY68seOwFo/DNThPqjZQFlBzt6Srjt/Urm15luODeOZYNsaS4L/8dR5xH/qeM+FVPI1inv/KHQRBwypNepyjXXY7bbU2FU/u2VTzFRMeBDRc5nKTTHLFQZzQmWDjKHi4plnc2P0/Q7k1HZVoM34Egr8Dev5mFU8jnvkZfBt4d9qUKN/c5277KL/yt3xzRBsbtKcG5SnZP25p+/WzAwAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31T227bMAz9lr4rWpEC23OcdEWAYjOSoq8DLTMeG1sydHERGP730ZZvK4o+8fCQlg4P5a3c3n+X93fw7jYqv25KymR79qCugqk/LaqtbF9rJfYX/ZruRRqyktQ5ZBp9zy3oZILHF8hKXPiF2zlnFIEno+fmHjwe0z78Av8EHt/hJlJLDcPl4KP2aBlPDVHJmO08a/1bofbijCpY8rcna0I9aPiSOOrConPiqJ0HrTBeFXEn3INsk6CuUcKIYkgNO3Bb6Jh3wuZOtgfwkIHD+dQ4xyzhkKyJqZuF2XjTIVlpGFhXgYYCrWzjBH1jDC9gC/QrB+aGj5VOoGJx+zI49rLvm+BP7oR+R+56wAtpmjb0kTHaA2m0K2789oy2oejfCPvrWO8Ja+PIGzuYtWRcLsF5UqWBPIOSpyVdNPzQdnXNXg6v5JlryVCLgv/L133Ec+ixZ8KrerRi9n+VdoKgYpUmvtghLrtd0LSQ1JoLlTxcaQo289kU86kT7jpxQmeC7e1gg021pL0Dn5b43IZytAk/BMH/CXr+/wp2ZJABFiocl/Y7+DrwMrXJUb65b832Qf7gn/fNEW1s0J4qlKcY/wGJuUYX2QMAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "RecruitmentStack/CDKMetadata/Default"
    }
+  }
+ },
+ "Parameters": {
+  "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+   "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+   "Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2"
+  },
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
   }
  },
  "Outputs": {
@@ -1438,21 +1630,38 @@
     "Ref": "AssetsBucket5CB76180"
    }
   },
-  "AmplifyAppId": {
-   "Description": "Amplify app ID",
+  "FrontendInstanceId": {
+   "Description": "Frontend EC2 instance ID",
    "Value": {
-    "Fn::GetAtt": [
-     "FrontendApp",
-     "AppId"
+    "Ref": "FrontendInstance4958698D"
+   }
+  },
+  "FrontendUrl": {
+   "Description": "Frontend URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "FrontendInstance4958698D",
+        "PublicDnsName"
+       ]
+      },
+      ":3001"
+     ]
     ]
    }
-  }
- },
- "Parameters": {
-  "BootstrapVersion": {
-   "Type": "AWS::SSM::Parameter::Value<String>",
-   "Default": "/cdk-bootstrap/hnb659fds/version",
-   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  },
+  "FrontendPublicIp": {
+   "Description": "Frontend EC2 public IP",
+   "Value": {
+    "Fn::GetAtt": [
+     "FrontendInstance4958698D",
+     "PublicIp"
+    ]
+   }
   }
  },
  "Rules": {

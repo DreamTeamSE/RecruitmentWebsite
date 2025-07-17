@@ -28,7 +28,7 @@ export function ViewModeProvider({ children }: ViewModeProviderProps) {
   const canToggleMode = React.useMemo(() => {
     if (!isAuthenticated || !user) return false;
 
-    const permissions = getRolePermissions(user.role);
+    const permissions = getRolePermissions(user.role as "user" | "admin" | "recruiter");
 
     // Only admin and recruiter can toggle modes
     return permissions.canAccessAdminPanel || permissions.canReviewApplications;

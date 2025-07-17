@@ -4,7 +4,7 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as amplify from 'aws-cdk-lib/aws-amplify';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import { Construct } from 'constructs';
 
@@ -154,10 +154,94 @@ export class SimpleRecruitmentStack extends cdk.Stack {
       defaultTargetGroups: [targetGroup],
     });
 
-    // Amplify App (basic setup)
-    const amplifyApp = new amplify.CfnApp(this, 'FrontendApp', {
-      name: 'recruitment-dev',
-      description: 'Recruitment website frontend',
+    // Security Group for Frontend EC2
+    const frontendSecurityGroup = new ec2.SecurityGroup(this, 'FrontendSecurityGroup', {
+      vpc,
+      description: 'Security group for frontend EC2 instance',
+      allowAllOutbound: true,
+    });
+
+    frontendSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(22),
+      'Allow SSH access'
+    );
+
+    frontendSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(80),
+      'Allow HTTP access'
+    );
+
+    frontendSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(3001),
+      'Allow Next.js app access'
+    );
+
+    frontendSecurityGroup.addIngressRule(
+      albSecurityGroup,
+      ec2.Port.tcp(3001),
+      'Allow ALB to frontend'
+    );
+
+    // IAM Role for EC2 to access ECR and other AWS services
+    const frontendRole = new iam.Role(this, 'FrontendRole', {
+      assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryReadOnly'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
+      ],
+    });
+
+    // Instance Profile
+    const frontendInstanceProfile = new iam.CfnInstanceProfile(this, 'FrontendInstanceProfile', {
+      roles: [frontendRole.roleName],
+    });
+
+    // User Data Script to install Node.js and deploy the frontend
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(
+      'yum update -y',
+      'yum install -y nodejs npm',
+      
+      // Install serve globally
+      'npm install -g serve',
+      
+      // Create app directory
+      'mkdir -p /opt/recruitment-frontend',
+      
+      // Create a simple index.html
+      'cat > /opt/recruitment-frontend/index.html << EOF',
+      '<!DOCTYPE html>',
+      '<html><head><title>Recruitment Website</title></head>',
+      '<body>',
+      '<h1>Recruitment Website Frontend</h1>',
+      '<p>This is running on EC2!</p>',
+      '<p>Backend URL: http://' + loadBalancer.loadBalancerDnsName + '</p>',
+      '<p>Instance ID: ' + '$(curl -s http://169.254.169.254/latest/meta-data/instance-id)' + '</p>',
+      '</body></html>',
+      'EOF',
+      
+      // Start serve in background on port 3001
+      'cd /opt/recruitment-frontend && nohup serve . -p 3001 > /var/log/frontend.log 2>&1 &',
+      
+      // Also start a simple Python HTTP server on port 80 as backup
+      'cd /opt/recruitment-frontend && nohup python3 -m http.server 80 > /var/log/backup-server.log 2>&1 &'
+    );
+
+    // EC2 Instance for Frontend (v2)
+    const frontendInstance = new ec2.Instance(this, 'FrontendInstance', {
+      vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux2(),
+      securityGroup: frontendSecurityGroup,
+      role: frontendRole,
+      userData: userData,
+      // No key pair needed for automatic deployment
     });
 
     // Outputs
@@ -186,9 +270,19 @@ export class SimpleRecruitmentStack extends cdk.Stack {
       description: 'Assets bucket name',
     });
 
-    new cdk.CfnOutput(this, 'AmplifyAppId', {
-      value: amplifyApp.attrAppId,
-      description: 'Amplify app ID',
+    new cdk.CfnOutput(this, 'FrontendInstanceId', {
+      value: frontendInstance.instanceId,
+      description: 'Frontend EC2 instance ID',
+    });
+
+    new cdk.CfnOutput(this, 'FrontendUrl', {
+      value: `http://${frontendInstance.instancePublicDnsName}:3001`,
+      description: 'Frontend URL',
+    });
+
+    new cdk.CfnOutput(this, 'FrontendPublicIp', {
+      value: frontendInstance.instancePublicIp,
+      description: 'Frontend EC2 public IP',
     });
   }
 }

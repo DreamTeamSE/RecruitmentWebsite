@@ -1,0 +1,15 @@
+{
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-recruitmentfrontend-prod-caf2b-authRole",
+      "UnauthRoleArn": "arn:aws:iam::229746606296:role/amplify-recruitmentfrontend-prod-caf2b-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::229746606296:role/amplify-recruitmentfrontend-prod-caf2b-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-recruitmentfrontend-prod-caf2b-deployment",
+      "UnauthRoleName": "amplify-recruitmentfrontend-prod-caf2b-unauthRole",
+      "StackName": "amplify-recruitmentfrontend-prod-caf2b",
+      "StackId": "arn:aws:cloudformation:us-east-2:229746606296:stack/amplify-recruitmentfrontend-prod-caf2b/d7debab0-62bb-11f0-b044-0ad224689599",
+      "AmplifyAppId": "d1bxx0zwg4ys9p"
+    }
+  }
+}

@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-deploy-role-229746606296-us-east-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::229746606296:role/cdk-hnb659fds-cfn-exec-role-229746606296-us-east-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-229746606296-us-east-2/66bb747033a231cbf7fe62aa42a6435d9aad594df858e26b893f29d54459d631.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-229746606296-us-east-2/e7aec43fc7ad90c1a4049a52ba033ea00d64193c8bde9025419fadf37f672262.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -418,10 +418,46 @@
             "data": "TargetGroup3D7CD9B8"
           }
         ],
-        "/RecruitmentStack/FrontendApp": [
+        "/RecruitmentStack/FrontendSecurityGroup/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "FrontendApp"
+            "data": "FrontendSecurityGroup69AD9D5B"
+          }
+        ],
+        "/RecruitmentStack/FrontendSecurityGroup/from RecruitmentStackAlbSecurityGroupD96B49D9:3001": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendSecurityGroupfromRecruitmentStackAlbSecurityGroupD96B49D93001DFB78892"
+          }
+        ],
+        "/RecruitmentStack/FrontendRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendRole815EA6D6"
+          }
+        ],
+        "/RecruitmentStack/FrontendInstanceProfile": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendInstanceProfile"
+          }
+        ],
+        "/RecruitmentStack/FrontendInstance/InstanceProfile": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendInstanceInstanceProfile13DD5D96"
+          }
+        ],
+        "/RecruitmentStack/FrontendInstance/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendInstance4958698D"
+          }
+        ],
+        "/RecruitmentStack/SsmParameterValue:--aws--service--ami-amazon-linux-latest--amzn2-ami-kernel-5.10-hvm-x86_64-gp2:C96584B6-F00A-464E-AD19-53AFF4B05118.Parameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter"
           }
         ],
         "/RecruitmentStack/VpcId": [
@@ -454,10 +490,22 @@
             "data": "AssetsBucketName"
           }
         ],
-        "/RecruitmentStack/AmplifyAppId": [
+        "/RecruitmentStack/FrontendInstanceId": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "AmplifyAppId"
+            "data": "FrontendInstanceId"
+          }
+        ],
+        "/RecruitmentStack/FrontendUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendUrl"
+          }
+        ],
+        "/RecruitmentStack/FrontendPublicIp": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendPublicIp"
           }
         ],
         "/RecruitmentStack/CDKMetadata/Default": [

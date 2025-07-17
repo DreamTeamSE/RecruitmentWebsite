@@ -97,7 +97,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
           }
         }
       } catch (error) {
-        logger.error('Error loading form data', error);
+        logger.error('Error loading form data', error as Error);
       } finally {
         setIsLoading(false);
       }
@@ -271,7 +271,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
                 continue;
               }
             } catch (error) {
-              logger.error("Error creating question", error, { questionId: question.id });
+              logger.error("Error creating question", error as Error, { questionId: question.id });
               continue;
             }
           }
@@ -311,7 +311,7 @@ const ApplicationTemplate: React.FC<ApplicationTemplateProps> = ({ applicationId
       return applicantResult.inserted_applicant;
       
     } catch (error) {
-      logger.error("Error submitting application", error);
+      logger.error("Error submitting application", error as Error);
       alert(`Failed to submit application: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
