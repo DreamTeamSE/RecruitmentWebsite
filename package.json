@@ -16,7 +16,8 @@
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && npm run start",
     "start:frontend": "cd frontend && npm run start",
-    "deploy": "./scripts/deploy-backend.sh && ./scripts/deploy-frontend.sh"
+    "deploy": "./scripts/deploy-backend.sh && ./scripts/deploy-frontend.sh",
+    "deploy:frontend-cdk": "./scripts/deploy-frontend-cdk.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Standalone output for Docker deployment
+  output: 'standalone',
+  
   // Temporarily disable strict checking for deployment
   typescript: {
     ignoreBuildErrors: true,
