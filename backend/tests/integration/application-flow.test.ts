@@ -7,7 +7,7 @@ describe('Complete Application Flow Integration Tests', () => {
   let staffId: string;
   let applicantId: number;
   let formId: number;
-  let questionIds: number[] = [];
+  const questionIds: number[] = [];
   let formEntryId: number;
   let interviewId: number;
   let interviewEntryId: number;
