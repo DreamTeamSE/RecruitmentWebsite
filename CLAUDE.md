@@ -1,7 +1,10 @@
-# Claude Infrastructure Documentation
-## Recruitment Website AWS Infrastructure Overview
+# CLAUDE.md
 
-*Last Updated: July 16, 2025*
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Recruitment Website Development Guide
+
+*Last Updated: July 17, 2025*
 
 ---
 
