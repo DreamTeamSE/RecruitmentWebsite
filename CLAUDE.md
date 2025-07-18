@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Recruitment Website Development Guide
 
-*Last Updated: July 17, 2025*
+*Last Updated: July 18, 2025*
 
 ---
 
 ## 📋 **Project Overview**
 
 ### **Application Architecture**
-- **Frontend**: Next.js deployed on AWS Amplify (HTTPS)
+- **Frontend**: Next.js 15 deployed on AWS Amplify (HTTPS)
 - **Backend**: Node.js/Express deployed on AWS ECS Fargate (containerized)
 - **Database**: AWS RDS PostgreSQL with SSL encryption
 - **CDN**: AWS CloudFront for HTTPS termination and global distribution
@@ -24,9 +24,274 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## 🏗️ **Infrastructure Components**
+## 🔧 **Development Workflow**
 
-### **1. Frontend Infrastructure (AWS Amplify)**
+### **Local Development Setup**
+```bash
+# Clone and install dependencies (npm workspaces)
+npm install
+
+# Start both frontend (3001) and backend (3000)
+npm run dev
+
+# Or start individually
+npm run dev:backend    # Backend only on port 3000
+npm run dev:frontend   # Frontend only on port 3001
+```
+
+### **Build Commands**
+```bash
+# Build everything
+npm run build
+
+# Build individually
+npm run build:backend   # TypeScript compilation with lint checks
+npm run build:frontend  # Next.js production build
+
+# Backend specific builds
+cd backend
+npm run build          # Full build: lint → type-check → compile
+npm run type-check     # TypeScript type checking only
+npm run clean          # Remove dist folder
+```
+
+### **Testing Commands**
+```bash
+# Run all tests
+npm run test
+
+# Backend testing
+cd backend
+npm run test                # All tests
+npm run test:integration    # Integration tests with database
+npm run test:watch         # Watch mode for development
+npm run test:coverage      # Coverage report
+
+# Single test file
+npm test -- tests/integration/complete-flow.test.ts
+
+# Frontend testing (not yet configured)
+npm run test:frontend  # Currently returns placeholder message
+```
+
+### **Code Quality Commands**
+```bash
+# Backend linting and formatting
+cd backend
+npm run lint           # ESLint with TypeScript rules
+npm run lint:fix       # Auto-fix linting issues
+npm run format         # Prettier formatting
+npm run format:check   # Check formatting without fixing
+```
+
+---
+
+## 🏗️ **Code Architecture**
+
+### **Backend Architecture (Repository Pattern)**
+
+The backend follows a clean **layered repository pattern**:
+
+```
+Controllers → Services → Repositories → Database
+```
+
+**Key Architectural Patterns:**
+- **Repository Pattern**: Clean separation between data access and business logic
+- **Singleton Database Manager**: Connection pooling with proper lifecycle management
+- **Middleware Chain**: Error handling, CORS, authentication
+- **Transaction Support**: Complex operations (e.g., form deletion with cascading)
+
+**Database Schema Structure:**
+```sql
+-- Core entity relationships
+staff (UUID) → forms (created_by) → questions (ordered) → form_entries → answers
+staff (UUID) → staff_application_notes (scoring/feedback)
+form_entries → interviews (scheduling)
+```
+
+**API Routing Structure:**
+- `/api/auth/*` - Authentication (login, register, verify-email)
+- `/api/forms/*` - Form CRUD operations
+- `/api/forms/:id/entries*` - Form submission handling
+- `/api/recruiter/*` - Staff management
+- `/api/applicant/*` - Applicant management
+- `/api/interview/*` - Interview scheduling
+
+### **Frontend Architecture (Next.js 15 App Router)**
+
+**State Management Strategy:**
+- **React Context**: Custom `AuthContext` with reducer pattern for authentication
+- **ViewModeContext**: UI state management for application views
+- **Session Storage**: Client-side user session persistence
+- **API Service Singleton**: Centralized API client with error handling and retry logic
+
+**Component Organization:**
+```
+components/
+├── ui/                 # Shadcn/ui reusable components
+├── applications/       # Application-specific components
+├── auth/              # Authentication components
+├── involved/          # Public-facing components
+└── providers/         # Context providers
+```
+
+**Next.js App Router Structure:**
+```
+app/
+├── auth/              # Authentication pages (signin, signup, verify)
+├── applications-review/ # Staff review interface with dynamic routes
+├── get-involved/      # Public application pages
+├── dashboard/         # User dashboard
+└── api/              # NextAuth routes and health check
+```
+
+### **Database Schema Details**
+
+**Entity Relationships:**
+- `staff` (1) → (many) `forms` - Staff can create multiple application forms
+- `forms` (1) → (many) `questions` - Forms contain ordered questions
+- `forms` (1) → (many) `form_entries` - Multiple applicants per form
+- `form_entries` (1) → (many) `answers` - Responses to form questions
+- `form_entries` (1) → (1) `staff_application_notes` - Staff feedback and scoring
+- `form_entries` (1) → (many) `interviews` - Interview scheduling
+
+**Key Design Decisions:**
+- **UUID primary keys for staff** (external-facing entities)
+- **Serial primary keys for internal entities** (applicants, form_entries)
+- **Unique constraints** on applicant-form combinations
+- **Ordered questions** within forms via `question_order` field
+- **Email verification system** with token expiration
+- **Backward compatibility view** mapping old `recruiters` table to `staff`
+
+---
+
+## 🧪 **Testing Strategy**
+
+### **Backend Testing Architecture**
+- **Jest + Supertest**: Integration testing framework with real database
+- **Test Coverage**: Configured for 80%+ coverage requirement
+- **Test Data Management**: Helper functions for unique test data generation
+- **End-to-End Workflows**: Complete application flow testing
+
+**Test Organization:**
+```
+tests/
+├── integration/       # Full workflow tests
+├── helpers/          # Test utilities and setup
+└── setup.ts          # Global test configuration
+```
+
+**Key Test Patterns:**
+```typescript
+// Complete workflow testing example
+describe('Complete Application Flow', () => {
+  // Staff creation → Form creation → Questions → Submissions → Reviews
+});
+
+// Test data helpers
+generateUniqueStaffData(role: string): StaffData
+generateUniqueApplicantData(): ApplicantData
+```
+
+### **Integration Test Examples**
+```bash
+# Run specific integration test
+npm test -- tests/integration/complete-flow.test.ts
+
+# Run application flow tests
+npm test -- tests/integration/application-flow.test.ts
+
+# Run form management tests
+npm test -- tests/integration/form-management.test.ts
+```
+
+---
+
+## 🐳 **Docker & Deployment**
+
+### **Docker Multi-Stage Builds**
+
+**Backend Dockerfile Features:**
+- **Multi-stage build** with distroless base image for security
+- **Non-root user execution** with proper permissions
+- **Health check integration** with /health endpoint
+- **Signal handling** with dumb-init for graceful shutdowns
+
+**Docker Commands:**
+```bash
+# Build backend for production
+cd backend
+docker build --platform linux/amd64 -t recruitment-backend .
+
+# Test local build
+docker run -p 3000:3000 recruitment-backend
+```
+
+### **AWS Deployment Process**
+
+**Backend Deployment (ECS):**
+```bash
+# Build and push to ECR
+docker build --platform linux/amd64 -t recruitment-backend .
+docker tag recruitment-backend:latest 229746606296.dkr.ecr.us-east-2.amazonaws.com/recruitment-backend:latest
+docker push 229746606296.dkr.ecr.us-east-2.amazonaws.com/recruitment-backend:latest
+
+# Update ECS service
+aws ecs update-service \
+  --cluster recruitment-backend-cluster \
+  --service recruitment-backend-service \
+  --force-new-deployment
+```
+
+**Frontend Deployment (Amplify):**
+```bash
+# Automatic deployment on git push to main branch
+git push origin main
+```
+
+---
+
+## 📊 **Database Management**
+
+### **Database Connection Configuration**
+```typescript
+// Singleton pattern with connection pooling
+class DatabaseManager {
+  - Connection pooling (max 20 connections)
+  - Health check integration
+  - Graceful shutdown handling
+  - Transaction support for complex operations
+}
+```
+
+### **Schema Migrations**
+```bash
+# Connect to production database
+psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
+     -U admin -d postgres
+
+# Run migration scripts in order
+psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
+     -U admin -d postgres -f backend/postgres-init/01_user.sql
+psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
+     -U admin -d postgres -f backend/postgres-init/02_applications.sql
+```
+
+### **Test Database Setup**
+```bash
+# Create local test database
+createdb recruitment_test
+
+# The tests use the same schema as production
+# No separate test migrations needed - tests create/drop tables as needed
+```
+
+---
+
+## 🔧 **Infrastructure Components**
+
+### **Frontend Infrastructure (AWS Amplify)**
 
 ```yaml
 Service: AWS Amplify
@@ -47,7 +312,7 @@ NEXT_PUBLIC_APP_VERSION=1.0.0
 NEXT_PUBLIC_API_TIMEOUT=30000
 ```
 
-### **2. Backend Infrastructure (AWS ECS Fargate)**
+### **Backend Infrastructure (AWS ECS Fargate)**
 
 ```yaml
 ECS Cluster: recruitment-backend-cluster
@@ -58,16 +323,6 @@ CPU: 512 vCPU
 Memory: 1024 MB
 Desired Count: 1
 Health Check: /health endpoint
-```
-
-**Container Configuration:**
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-EXPOSE 3000
-USER node
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
 ```
 
 **Environment Variables:**
@@ -84,7 +339,7 @@ SMTP_USER=internal.software@dreamteameng.org
 SMTP_PASSWORD=***
 ```
 
-### **3. Database Infrastructure (AWS RDS)**
+### **Database Infrastructure (AWS RDS)**
 
 ```yaml
 Engine: PostgreSQL 15
@@ -99,20 +354,7 @@ Backup Retention: 7 days
 Multi-AZ: No (single instance)
 ```
 
-**Database Schema:**
-```sql
--- Main tables
-users (id, email, password, role, created_at, updated_at)
-staff (id, user_id, first_name, last_name, position, department)
-applicants (id, user_id, first_name, last_name, email, phone)
-application_forms (id, title, description, staff_id, created_at)
-form_questions (id, form_id, question_text, type, required, placeholder)
-form_entries (id, form_id, applicant_id, submitted_at, status)
-form_responses (id, entry_id, question_id, answer_text)
-interviews (id, applicant_id, staff_id, scheduled_at, status)
-```
-
-### **4. Container Registry (AWS ECR)**
+### **Container Registry (AWS ECR)**
 
 ```yaml
 Repository: recruitment-backend
@@ -122,7 +364,7 @@ Architecture: linux/amd64
 Scan on Push: Enabled
 ```
 
-### **5. Load Balancer (AWS ALB)**
+### **Load Balancer (AWS ALB)**
 
 ```yaml
 Name: recruitment-backend-alb
@@ -134,7 +376,7 @@ Target Group: recruitment-backend-targets
 Health Check: /health
 ```
 
-### **6. Content Delivery Network (AWS CloudFront)**
+### **Content Delivery Network (AWS CloudFront)**
 
 ```yaml
 Distribution: d2oc9fk5wyihzt.cloudfront.net
@@ -164,7 +406,7 @@ GET    /api/forms/feed         # Get all forms
 POST   /api/forms/application  # Create new form
 GET    /api/forms/:id          # Get specific form
 PUT    /api/forms/:id          # Update form
-DELETE /api/forms/:id          # Delete form
+DELETE /api/forms/:id          # Delete form (cascades to questions/entries)
 ```
 
 ### **Form Submission Endpoints**
@@ -176,7 +418,7 @@ GET  /api/forms/:id/entries/:entryId  # Get specific submission
 
 ### **User Management Endpoints**
 ```bash
-POST /api/recruiter/create     # Create recruiter
+POST /api/recruiter/create     # Create recruiter/staff
 POST /api/applicant/create     # Create applicant
 GET  /api/users/profile        # Get user profile
 PUT  /api/users/profile        # Update user profile
@@ -184,7 +426,7 @@ PUT  /api/users/profile        # Update user profile
 
 ### **System Endpoints**
 ```bash
-GET /health                    # Health check
+GET /health                    # Health check with database connectivity
 GET /api/status               # System status
 ```
 
@@ -229,6 +471,12 @@ const corsOptions = {
 
 ## 📊 **Monitoring & Logging**
 
+### **Application Logging**
+- **Structured logging** with `logger.service.ts`
+- **API request/response logging** for debugging
+- **Error tracking** with context and stack traces
+- **Performance monitoring** for database queries
+
 ### **CloudWatch Integration**
 ```yaml
 Log Group: /aws/ecs/recruitment-backend
@@ -244,7 +492,7 @@ curl -f http://localhost:3000/health
 
 # ALB Health Check
 GET /health
-Expected Response: {"status":"OK"}
+Expected Response: {"status":"OK","database":"connected","timestamp":"..."}
 Timeout: 5 seconds
 Interval: 30 seconds
 Healthy Threshold: 2
@@ -260,40 +508,85 @@ GET /metrics                  # Application metrics (if enabled)
 
 ---
 
-## 🔧 **Deployment Process**
+## 🔧 **Troubleshooting**
 
-### **1. Frontend Deployment (Amplify)**
+### **Common Issues & Solutions**
+
+**1. CORS Errors**
 ```bash
-# Automatic deployment on git push to main branch
-git push origin main
+# Check CORS configuration
+curl -H "Origin: https://main.d1d64zijwu2pjz.amplifyapp.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: X-Requested-With" \
+     -X OPTIONS \
+     https://d2oc9fk5wyihzt.cloudfront.net/api/auth/login
 ```
 
-### **2. Backend Deployment (ECS)**
+**2. Database Connection Issues**
 ```bash
-# Build Docker image
-docker build --platform linux/amd64 -t recruitment-backend .
+# Test database connection
+psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
+     -U admin -d postgres -c "SELECT version();"
+```
 
-# Tag and push to ECR
-docker tag recruitment-backend:latest 229746606296.dkr.ecr.us-east-2.amazonaws.com/recruitment-backend:latest
-docker push 229746606296.dkr.ecr.us-east-2.amazonaws.com/recruitment-backend:latest
+**3. Build Failures**
+```bash
+# Check TypeScript compilation
+cd backend
+npm run type-check
+
+# Check linting issues
+npm run lint
+
+# Clean build
+npm run clean && npm run build
+```
+
+**4. Test Failures**
+```bash
+# Run tests with verbose output
+npm run test -- --verbose
+
+# Run specific test file
+npm test -- tests/integration/complete-flow.test.ts
+
+# Check test database connection
+# Tests create their own temporary data
+```
+
+### **Useful Commands**
+
+```bash
+# Check ECS service status
+aws ecs describe-services --cluster recruitment-backend-cluster --services recruitment-backend-service
+
+# View CloudWatch logs
+aws logs describe-log-streams --log-group-name /aws/ecs/recruitment-backend
 
 # Update ECS service
-aws ecs update-service \
-  --cluster recruitment-backend-cluster \
-  --service recruitment-backend-service \
-  --force-new-deployment
+aws ecs update-service --cluster recruitment-backend-cluster --service recruitment-backend-service --force-new-deployment
+
+# Check RDS status
+aws rds describe-db-instances --db-instance-identifier recruitment-backend-db
+
+# CloudFront cache invalidation
+aws cloudfront create-invalidation --distribution-id E1234567890 --paths "/*"
 ```
 
-### **3. Database Migrations**
-```bash
-# Connect to RDS
-psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
-     -U admin -d postgres
+---
 
-# Run migration scripts
-psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
-     -U admin -d postgres -f database/01_user.sql
-```
+## 📈 **Performance Metrics**
+
+### **Current Performance**
+- **Response Time**: ~200-500ms average
+- **Throughput**: 100 requests/minute (rate limited)
+- **Availability**: 99.9% uptime
+- **Database Connections**: Max 20 concurrent (connection pooling)
+
+### **Scaling Considerations**
+- **ECS**: Auto-scaling not configured (manual scaling required)
+- **RDS**: Single instance (no read replicas)
+- **CloudFront**: Global edge locations active
 
 ---
 
@@ -363,75 +656,6 @@ NEXTAUTH_URL=https://main.d1d64zijwu2pjz.amplifyapp.com
 
 ---
 
-## 🔧 **Troubleshooting**
-
-### **Common Issues & Solutions**
-
-**1. CORS Errors**
-```bash
-# Check CORS configuration
-curl -H "Origin: https://main.d1d64zijwu2pjz.amplifyapp.com" \
-     -H "Access-Control-Request-Method: POST" \
-     -H "Access-Control-Request-Headers: X-Requested-With" \
-     -X OPTIONS \
-     https://d2oc9fk5wyihzt.cloudfront.net/api/auth/login
-```
-
-**2. Database Connection Issues**
-```bash
-# Test database connection
-psql -h recruitment-backend-db.cd0eoiq8iq3g.us-east-2.rds.amazonaws.com \
-     -U admin -d postgres -c "SELECT version();"
-```
-
-**3. Health Check Failures**
-```bash
-# Check ECS service health
-aws ecs describe-services \
-  --cluster recruitment-backend-cluster \
-  --services recruitment-backend-service
-
-# Check ALB target health
-aws elbv2 describe-target-health \
-  --target-group-arn arn:aws:elasticloadbalancing:us-east-2:229746606296:targetgroup/recruitment-backend-targets/...
-```
-
-### **Useful Commands**
-
-```bash
-# Check ECS service status
-aws ecs describe-services --cluster recruitment-backend-cluster --services recruitment-backend-service
-
-# View CloudWatch logs
-aws logs describe-log-streams --log-group-name /aws/ecs/recruitment-backend
-
-# Update ECS service
-aws ecs update-service --cluster recruitment-backend-cluster --service recruitment-backend-service --force-new-deployment
-
-# Check RDS status
-aws rds describe-db-instances --db-instance-identifier recruitment-backend-db
-
-# CloudFront cache invalidation
-aws cloudfront create-invalidation --distribution-id E1234567890 --paths "/*"
-```
-
----
-
-## 📈 **Performance Metrics**
-
-### **Current Performance**
-- **Response Time**: ~200-500ms average
-- **Throughput**: 100 requests/minute (rate limited)
-- **Availability**: 99.9% uptime
-- **Database Connections**: Max 100 concurrent
-
-### **Scaling Considerations**
-- **ECS**: Auto-scaling not configured (manual scaling required)
-- **RDS**: Single instance (no read replicas)
-- **CloudFront**: Global edge locations active
-
----
-
 ## 🔮 **Future Enhancements**
 
 ### **Planned Improvements**
@@ -440,6 +664,8 @@ aws cloudfront create-invalidation --distribution-id E1234567890 --paths "/*"
 3. **Monitoring**: Enhanced monitoring with custom metrics
 4. **Security**: WAF integration for additional protection
 5. **CI/CD**: GitHub Actions for automated deployments
+6. **Frontend Testing**: Jest + Testing Library + Cypress setup
+7. **Caching**: Redis for session storage and API response caching
 
 ### **Cost Optimization**
 - **Reserved Instances**: Consider RDS reserved instances
