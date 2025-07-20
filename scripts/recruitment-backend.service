@@ -1,0 +1,60 @@
+# Systemd Service Configuration for Recruitment Backend
+# Location: /etc/systemd/system/recruitment-backend.service
+
+[Unit]
+Description=Recruitment Backend API Service
+Documentation=https://github.com/user/RecruitmentWebsite
+After=network.target
+After=docker.service
+Requires=docker.service
+After=postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=exec
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/home/ec2-user/recruitment-app
+
+# Environment variables
+Environment=NODE_ENV=production
+Environment=PORT=3000
+EnvironmentFile=/home/ec2-user/recruitment-app/.env.production
+
+# Start the application using Docker Compose
+ExecStartPre=/usr/local/bin/docker-compose -f docker-compose.ec2.yml down
+ExecStart=/usr/local/bin/docker-compose -f docker-compose.ec2.yml up --no-deps app
+ExecStop=/usr/local/bin/docker-compose -f docker-compose.ec2.yml down
+ExecReload=/usr/local/bin/docker-compose -f docker-compose.ec2.yml restart app
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65536
+LimitCORE=0
+
+# Process management
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+TimeoutStartSec=60
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/ec2-user/recruitment-app
+ReadWritePaths=/var/log/recruitment
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=recruitment-backend
+
+[Install]
+WantedBy=multi-user.target
